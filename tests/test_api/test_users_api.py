@@ -13,6 +13,7 @@ from fastapi import HTTPException
 import json
 from urllib.parse import urlencode
 from sqlalchemy.exc import DBAPIError
+from uuid import uuid4
 
 
 
@@ -411,8 +412,23 @@ async def test_create_user_invalid_data(async_client, admin_token):
     invalid_user_data = {"email": "not-an-email", "password": "short"}
     response = await async_client.post("/users/", json=invalid_user_data, headers=headers)
     assert response.status_code == 422  # Validation Error
-    
-    
 
+@pytest.mark.asyncio
+async def test_get_user_not_found(async_client, admin_token):
+    non_existent_user_id = str(uuid4())  # Generate a valid but non-existent UUID
+    response = await async_client.get(
+        f"/users/{non_existent_user_id}",
+        headers={"Authorization": f"Bearer {admin_token}"}
+    )
+    assert response.status_code == 404, "Expected 404 for a non-existent user ID"
+
+@pytest.mark.asyncio
+async def test_delete_user_not_found(async_client, admin_token):
+    non_existent_user_id = str(uuid4())  # Generate a valid but non-existent UUID
+    response = await async_client.delete(
+        f"/users/{non_existent_user_id}",
+        headers={"Authorization": f"Bearer {admin_token}"}
+    )
+    assert response.status_code == 404, "Expected 404 for deleting a non-existent user"
 
 

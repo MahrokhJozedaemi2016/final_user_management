@@ -508,3 +508,138 @@ async def test_login_user_success(db_session, verified_user):
     assert result is not None, "Expected login_user to return a user but got None"
     assert result.email == email, "Email mismatch in the returned user object"
     assert result.nickname == user.nickname, "Nickname mismatch in the returned user object"
+
+
+
+@pytest.mark.asyncio
+async def test_execute_query_with_commit(db_session: AsyncSession):
+    """
+    Test the `_execute_query` method with commit=True.
+    """
+    query = User.__table__.insert().values(
+        id=uuid4(),
+        email="testuser@example.com",
+        nickname="testuser",
+        hashed_password=hash_password("Password123"),
+        role=UserRole.AUTHENTICATED
+    )
+    result = await UserService._execute_query(db_session, query, commit=True)
+    assert result is not None, "Query should execute successfully with commit=True"
+
+
+@pytest.mark.asyncio
+async def test_create_user_validation_error(db_session: AsyncSession, email_service):
+    """
+    Test the `create` method for ValidationError.
+    """
+    user_data = {"email": "invalid-email"}  # Missing required fields
+    user = await UserService.create(db_session, user_data, email_service)
+    assert user is None, "User creation should fail due to validation error"
+
+
+@pytest.mark.asyncio
+async def test_create_user_password_validation_error(db_session: AsyncSession, email_service):
+    """
+    Test the `create` method with an invalid password.
+    """
+    user_data = {
+        "email": "testuser@example.com",
+        "password": "short",  # Invalid password
+    }
+    user = await UserService.create(db_session, user_data, email_service)
+    assert user is None, "User creation should fail due to password validation error"
+
+
+@pytest.fixture
+async def existing_user(db_session: AsyncSession) -> User:
+    """
+    Fixture to create and return an existing user in the database.
+    """
+    user = User(
+        id=uuid4(),
+        email="existinguser@example.com",
+        nickname="existinguser",
+        hashed_password=hash_password("Password123"),
+        role=UserRole.AUTHENTICATED
+    )
+    db_session.add(user)
+    await db_session.commit()
+    await db_session.refresh(user)
+    return user
+
+
+@pytest.mark.asyncio
+async def test_update_user_nickname_conflict(db_session: AsyncSession, existing_user: User):
+    """
+    Test the `update` method when the nickname already exists.
+    """
+    # Add another user with the conflicting nickname
+    new_user = User(
+        id=uuid4(),
+        email="anotheruser@example.com",
+        nickname="conflictingnickname",
+        hashed_password=hash_password("Password123"),
+        role=UserRole.AUTHENTICATED
+    )
+    db_session.add(new_user)
+    await db_session.commit()
+
+    # Attempt to update `existing_user` to the conflicting nickname
+    with pytest.raises(HTTPException) as exc_info:
+        await UserService.update(
+            db_session,
+            user_id=existing_user.id,
+            update_data={"nickname": "conflictingnickname"}
+        )
+    assert exc_info.value.status_code == 400, "Nickname conflict should raise 400 error"
+
+
+@pytest.mark.asyncio
+async def test_update_user_invalid_bio(db_session: AsyncSession, existing_user: User):
+    """
+    Test the `update` method with an invalid bio.
+    """
+    with pytest.raises(HTTPException) as exc_info:
+        await UserService.update(
+            db_session,
+            user_id=existing_user.id,
+            update_data={"bio": "a" * 501}  # Bio exceeds max length
+        )
+    assert exc_info.value.status_code == 422, "Bio exceeding max length should raise 422 error"
+
+@pytest.mark.asyncio
+async def test_verify_email_with_invalid_token(db_session: AsyncSession, existing_user: User):
+    """
+    Test the `verify_email_with_token` method with an invalid token.
+    """
+    result = await UserService.verify_email_with_token(
+        db_session,
+        user_id=existing_user.id,
+        token="invalid-token"
+    )
+    assert not result, "Verification with invalid token should fail"
+
+
+@pytest.mark.asyncio
+async def test_reset_password_invalid_user(db_session: AsyncSession):
+    """
+    Test the `reset_password` method with an invalid user ID.
+    """
+    result = await UserService.reset_password(
+        db_session,
+        user_id=uuid4(),  # Non-existent user ID
+        new_password="NewSecurePassword123"
+    )
+    assert not result, "Resetting password for non-existent user should fail"
+
+
+@pytest.mark.asyncio
+async def test_unlock_user_account_invalid_user(db_session: AsyncSession):
+    """
+    Test the `unlock_user_account` method with an invalid user ID.
+    """
+    result = await UserService.unlock_user_account(
+        db_session,
+        user_id=uuid4()  # Non-existent user ID
+    )
+    assert not result, "Unlocking a non-existent user account should fail"
