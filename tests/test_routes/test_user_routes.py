@@ -22,6 +22,8 @@ from app.models.user_model import UserRole
 from datetime import timedelta
 from app.utils.security import hash_password
 from sqlalchemy.future import select
+from fastapi.testclient import TestClient
+from app.main import app
 
 
 fake = Faker()
@@ -739,3 +741,129 @@ async def test_login_invalid_credentials(async_client):
     )
     assert response.status_code == 401
     assert "Incorrect email or password" in response.json()["detail"]
+
+##########################
+
+
+@pytest.mark.asyncio
+async def test_create_user_missing_required_fields(async_client, admin_token):
+    """
+    Test that creating a user fails when required fields are missing.
+    """
+    auth_headers = {"Authorization": f"Bearer {admin_token}"}
+    invalid_payload = {}  # Missing all required fields
+
+    response = await async_client.post("/users/", json=invalid_payload, headers=auth_headers)
+
+    assert response.status_code == 422
+    assert "field required" in response.json()["detail"][0]["msg"].lower()
+
+@pytest.mark.asyncio
+async def test_update_user_missing_payload(async_client, admin_token, admin_user):
+    """
+    Test that updating a user fails when no payload is provided.
+    """
+    auth_headers = {"Authorization": f"Bearer {admin_token}"}
+
+    response = await async_client.put(
+        f"/users/{admin_user.id}",
+        json={},  # Empty payload
+        headers=auth_headers
+    )
+
+    assert response.status_code == 422
+    # Assert that at least one field must be provided
+    detail_messages = [error["msg"].lower() for error in response.json()["detail"]]
+    assert any("at least one field must be provided" in msg for msg in detail_messages)
+
+
+
+
+@pytest.mark.asyncio
+async def test_list_users_large_skip_value(async_client, admin_token):
+    """
+    Verify that the list_users endpoint handles large skip values gracefully.
+    """
+    auth_headers = {"Authorization": f"Bearer {admin_token}"}
+
+    response = await async_client.get("/users/?skip=1000&limit=10", headers=auth_headers)
+
+    assert response.status_code == 200
+    assert len(response.json().get("items", [])) == 0  # No users returned for large skip
+
+
+@pytest.mark.asyncio
+async def test_verify_email_missing_token(async_client, verified_user):
+    """
+    Test that verify_email endpoint fails when the token is missing.
+    """
+    response = await async_client.get(f"/verify-email/{verified_user.id}/")
+
+    assert response.status_code == 404
+
+
+################################
+@pytest.mark.asyncio
+async def test_list_users_empty_db(async_client, admin_token, db_session):
+    """Test listing users when no users exist in the database."""
+    # Clear users table
+    await db_session.execute(text("DELETE FROM users"))
+    await db_session.commit()
+
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    response = await async_client.get("/users/?skip=0&limit=10", headers=headers)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["total"] == 0
+    assert len(response_data["items"]) == 0
+
+
+@pytest.mark.asyncio
+async def test_list_users_valid_pagination(async_client, admin_token, users_with_same_role_50_users):
+    """Test listing users with valid pagination parameters."""
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    # Fetch the first page
+    response_page_1 = await async_client.get("/users/?skip=0&limit=10", headers=headers)
+    assert response_page_1.status_code == 200
+    response_data_page_1 = response_page_1.json()
+    assert len(response_data_page_1["items"]) == 10
+    assert response_data_page_1["total"] == 51  # Corrected expected total
+    
+
+@pytest.mark.asyncio
+async def test_list_users_partial_page(async_client, admin_token, users_with_same_role_50_users):
+    """Test listing users when only a partial page of results is available."""
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    response = await async_client.get("/users/?skip=40&limit=20", headers=headers)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert len(response_data["items"]) == 11  # Corrected expectation
+    assert response_data["total"] == 51  # Ensure total matches 
+
+
+@pytest.mark.asyncio
+async def test_list_users_without_permission(async_client, user_token):
+    """Test listing users with insufficient permissions."""
+    headers = {"Authorization": f"Bearer {user_token}"}  # Token for a regular user
+    response = await async_client.get("/users/", headers=headers)
+    assert response.status_code == 403  # Forbidden
+    assert "detail" in response.json()
+    assert response.json()["detail"] == "Operation not permitted"  # Match actual message
+    
+    
+@pytest.mark.asyncio
+async def test_list_users_with_results(async_client, admin_token, users_with_same_role_50_users):
+    headers = {"Authorization": f"Bearer {admin_token}"}
+    response = await async_client.get("/users/?skip=0&limit=10", headers=headers)
+    assert response.status_code == 200
+    response_data = response.json()
+    assert response_data["total"] == 51
+    assert len(response_data["items"]) == 10
+    
+
+
+
+
+
+
