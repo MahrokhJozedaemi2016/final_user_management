@@ -1,3 +1,4 @@
+
 """
 This Python file is part of a FastAPI application, demonstrating user management functionalities including creating, reading,
 updating, and deleting (CRUD) user information. It uses OAuth2 with Password Flow for security, ensuring that only authenticated
@@ -215,9 +216,10 @@ async def list_users(
     return UserListResponse(
         items=user_responses,
         total=total_users,
-        page=skip // limit + 1,
+        page=(skip // limit) + 1,
         size=len(user_responses),
-        links=pagination_links  # Ensure you have appropriate logic to create these links
+        links=pagination_links,  # Ensure you have appropriate logic to create these links
+        filters=None
     )
 
 
@@ -268,33 +270,57 @@ async def verify_email(user_id: UUID, token: str, db: AsyncSession = Depends(get
         return {"message": "Email verified successfully"}
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired verification token")
 
-
-@router.get("/users", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
-async def search_users(
+@router.get("/users-basic", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
+async def basic_search_users(
     request: Request,
     username: Optional[str] = None,
     email: Optional[str] = None,
-    role: Optional[str] = None,
-    account_status: Optional[bool] = None,
-    registration_date_start: Optional[datetime] = None,
-    registration_date_end: Optional[datetime] = None,
     skip: int = 0,
     limit: int = 10,
     db: AsyncSession = Depends(get_db),
     current_user: dict = Depends(require_role(["ADMIN", "MANAGER"]))
 ):
     """
-    Endpoint to search and filter users based on various criteria.
+    Basic search endpoint for filtering users by username or email.
     """
     filters = {
         "username": username,
         "email": email,
-        "role": role,
-        "account_status": account_status,
-        "registration_date_start": registration_date_start,
-        "registration_date_end": registration_date_end,
     }
-    print("Received filters:", filters)  # Debug log
+    print("Received basic search filters:", filters)  # Debug log
+    users, total_users = await UserService.search_and_filter_users(db, filters, skip, limit)
+    user_responses = [UserResponse.model_validate(user) for user in users]
+    pagination_links = generate_pagination_links(request, skip, limit, total_users)
+
+    
+    
+    
+    return UserListResponse(
+        items=user_responses,
+        total=total_users,
+        page=skip // limit + 1,
+        size=len(user_responses),
+        links=pagination_links
+    )
+
+@router.post("/users-advanced", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
+async def advanced_search_users(
+    request: Request,
+    filters: dict,
+    skip: int = 0,
+    limit: int = 10,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"]))
+):
+    """
+    Advanced search endpoint for filtering users with detailed criteria.
+
+    Args:
+        - filters (dict): JSON body containing search criteria.
+        - skip (int): Number of records to skip for pagination.
+        - limit (int): Number of records to retrieve for pagination.
+    """
+    print("Received advanced search filters:", filters)  # Debug log
     users, total_users = await UserService.search_and_filter_users(db, filters, skip, limit)
     user_responses = [UserResponse.model_validate(user) for user in users]
     pagination_links = generate_pagination_links(request, skip, limit, total_users)
@@ -306,8 +332,8 @@ async def search_users(
         size=len(user_responses),
         links=pagination_links
     )
-    
-    ##########################
+
+
 @router.patch("/users/{user_id}/profile-picture", response_model=UserResponse, name="update_user_profile_picture", tags=["User Profile"])
 async def update_user_profile_picture(
     user_id: UUID,
@@ -352,3 +378,41 @@ async def update_user_bio(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     return UserResponse.model_validate(updated_user)
+
+
+@router.post("/login/", response_model=TokenResponse, tags=["Login and Registration"])
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_db)):
+    try:
+        # Log the login attempt
+        logger.info(f"Login attempt for username: {form_data.username}")
+
+        # Check if the account is locked
+        if await UserService.is_account_locked(session, form_data.username):
+            logger.warning(f"Account locked for username: {form_data.username}")
+            raise HTTPException(status_code=400, detail="Account locked due to too many failed login attempts.")
+        
+        # Authenticate user
+        user = await UserService.login_user(session, form_data.username, form_data.password)
+        if user:
+            # Generate JWT token
+            logger.info(f"Login successful for username: {form_data.username}")
+            access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+            access_token = create_access_token(
+                data={"sub": user.email, "role": str(user.role.name)},
+                expires_delta=access_token_expires
+            )
+            return {"access_token": access_token, "token_type": "bearer"}
+        
+        # Log invalid login
+        logger.warning(f"Invalid login attempt for username: {form_data.username}")
+        raise HTTPException(status_code=401, detail="Incorrect email or password.")
+    
+    except HTTPException as e:
+        logger.error(f"HTTPException during login for username: {form_data.username}: {str(e)}")
+        raise e
+    
+    except Exception as e:
+        logger.error(f"Unexpected error during login for username: {form_data.username}: {str(e)}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+
+
