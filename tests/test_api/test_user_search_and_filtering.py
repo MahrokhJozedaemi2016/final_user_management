@@ -29,8 +29,9 @@ async def test_search_users_api(async_client, admin_token):
         "account_status": True,  # Boolean passed as expected by the API
     }
 
+    # Ensure URL path matches API routing and avoids the 307 redirect
     response = await async_client.get(
-        f"/users?{urlencode(query_params)}",
+        f"/users/?{urlencode(query_params)}",  # Note the trailing slash
         headers=headers
     )
 
@@ -43,8 +44,10 @@ async def test_search_users_api(async_client, admin_token):
         except Exception as e:
             print(f"Failed to parse JSON response: {e}")
 
+    # Assert the status code is 200
     assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
 
+    # Validate response content
     data = response.json()
     assert "items" in data, "Response should include 'items' key"
     assert isinstance(data["items"], list), "'items' should be a list"
@@ -52,17 +55,21 @@ async def test_search_users_api(async_client, admin_token):
     assert all("email" in user for user in data["items"]), "Each user should have an 'email'"
     
     
-    
 @pytest.mark.asyncio
 async def test_empty_filters_api(async_client, admin_token):
     """
-    Test the `/users` endpoint with no filters provided.
+    Test the `/users/` endpoint with no filters provided.
     """
     headers = {"Authorization": f"Bearer {admin_token}"}
     query_params = {}  # No filters applied
 
-    response = await async_client.get(f"/users?{urlencode(query_params)}", headers=headers)
+    # Ensure the endpoint URL has a trailing slash
+    response = await async_client.get(f"/users/?{urlencode(query_params)}", headers=headers)
+
+    # Assert the status code is 200
     assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
+
+    # Validate response data
     data = response.json()
     assert isinstance(data["items"], list), "Response items should be a list"
     assert data["total"] > 0, "Response should return at least one user"
@@ -70,32 +77,35 @@ async def test_empty_filters_api(async_client, admin_token):
 @pytest.mark.asyncio
 async def test_fetch_all_users(async_client, admin_token):
     """
-    Test the `/users` endpoint with no filters to fetch all users.
+    Test the `/users/` endpoint with no filters to fetch all users.
     """
     headers = {"Authorization": f"Bearer {admin_token}"}
     query_params = {"skip": 0, "limit": 10}  # Basic pagination parameters
 
-    response = await async_client.get(f"/users?{urlencode(query_params)}", headers=headers)
+    # Ensure the endpoint URL has a trailing slash
+    response = await async_client.get(f"/users/?{urlencode(query_params)}", headers=headers)
 
-    # Assert the API response
+    # Assert the status code is 200
     assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
+
+    # Validate response data
     data = response.json()
     assert "items" in data, "Response should include an 'items' key"
     assert isinstance(data["items"], list), "'items' should be a list"
     assert data["total"] >= 0, "Total users count should be a non-negative integer"
-
-
+    
 @pytest.mark.asyncio
 async def test_search_users_pagination(async_client, admin_token):
     """
-    Test the `/users` endpoint with pagination parameters.
+    Test the `/users/` endpoint with pagination parameters.
     """
     headers = {"Authorization": f"Bearer {admin_token}"}
     query_params = {"skip": 0, "limit": 5}  # Test fetching the first 5 users
 
-    response = await async_client.get(f"/users?{urlencode(query_params)}", headers=headers)
+    # Ensure the endpoint URL has a trailing slash
+    response = await async_client.get(f"/users/?{urlencode(query_params)}", headers=headers)
 
-    # Assert the response
+    # Assert the response for the first page
     assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
     data = response.json()
 
@@ -106,13 +116,12 @@ async def test_search_users_pagination(async_client, admin_token):
 
     # Test the next page
     query_params = {"skip": 5, "limit": 5}  # Test fetching the next 5 users
-    response = await async_client.get(f"/users?{urlencode(query_params)}", headers=headers)
+    response = await async_client.get(f"/users/?{urlencode(query_params)}", headers=headers)
 
+    # Assert the response for the next page
     assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
     data = response.json()
 
     assert "items" in data, "Response should include an 'items' key"
     assert isinstance(data["items"], list), "'items' should be a list"
     assert len(data["items"]) <= 5, "Number of users in the response should not exceed the limit"
-
-
