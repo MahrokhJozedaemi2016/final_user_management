@@ -6,7 +6,8 @@ from app.dependencies import get_settings
 from app.models.user_model import User, UserRole
 from app.services.user_service import UserService
 from app.utils.nickname_gen import generate_nickname
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+
 
 
 pytestmark = pytest.mark.asyncio
@@ -139,3 +140,82 @@ async def test_filter_users_case_insensitive(db_session, users_with_same_role_50
         user.email.lower() == users_with_same_role_50_users[0].email.lower()
         for user in users_by_email
     ), "All returned users should match the email filter case-insensitively"
+
+
+
+
+@pytest.mark.asyncio
+async def test_advanced_search_users_with_no_filters(db_session, users_with_same_role_50_users):
+    """
+    Test advanced search with no filters.
+    """
+    filters = {}
+    total, users = await UserService.advanced_search_users(db_session, filters)
+
+    assert total == len(users_with_same_role_50_users), "Total users should match all users"
+    assert len(users) <= 10, "Default limit should apply when no pagination is provided"
+
+@pytest.mark.asyncio
+async def test_advanced_search_users_with_username_filter(db_session, users_with_same_role_50_users):
+    """
+    Test advanced search with a username filter.
+    """
+    target_user = users_with_same_role_50_users[0]
+    filters = {"username": target_user.nickname[:3]}  # Partial match
+    total, users = await UserService.advanced_search_users(db_session, filters)
+
+    assert total > 0, "Total should reflect matching users"
+    assert all(target_user.nickname[:3].lower() in user.nickname.lower() for user in users), "All returned users should match the username filter"
+
+@pytest.mark.asyncio
+async def test_advanced_search_users_with_email_filter(db_session, users_with_same_role_50_users):
+    """
+    Test advanced search with an email filter.
+    """
+    target_user = users_with_same_role_50_users[0]
+    filters = {"email": target_user.email[:3]}  # Partial match
+    total, users = await UserService.advanced_search_users(db_session, filters)
+
+    assert total > 0, "Total should reflect matching users"
+    assert all(target_user.email[:3].lower() in user.email.lower() for user in users), "All returned users should match the email filter"
+
+@pytest.mark.asyncio
+async def test_advanced_search_users_with_role_filter(db_session, users_with_same_role_50_users):
+    """
+    Test advanced search with a role filter.
+    """
+    filters = {"role": UserRole.AUTHENTICATED}
+    total, users = await UserService.advanced_search_users(db_session, filters)
+
+    assert total > 0, "Total should reflect users with the specified role"
+    assert all(user.role == UserRole.AUTHENTICATED for user in users), "All users should have the specified role"
+
+@pytest.mark.asyncio
+async def test_advanced_search_users_with_date_range_filter(db_session, users_with_same_role_50_users):
+    """
+    Test advanced search with a date range filter.
+    """
+    # Use timezone-aware datetimes
+    created_from = datetime.now(timezone.utc) - timedelta(days=30)
+    created_to = datetime.now(timezone.utc)
+    filters = {"created_from": created_from, "created_to": created_to}
+
+    # Call the service method
+    total, users = await UserService.advanced_search_users(db_session, filters)
+
+    # Assertions
+    assert total > 0, "Total should reflect users created within the date range"
+    assert all(
+        created_from <= user.created_at <= created_to for user in users
+    ), "All users should be within the date range"
+
+@pytest.mark.asyncio
+async def test_advanced_search_users_with_pagination(db_session, users_with_same_role_50_users):
+    """
+    Test advanced search with pagination.
+    """
+    filters = {"skip": 10, "limit": 10}
+    total, users = await UserService.advanced_search_users(db_session, filters)
+
+    assert total == len(users_with_same_role_50_users), "Total users should match all users"
+    assert len(users) == 10, "Pagination should limit the results to 10"
