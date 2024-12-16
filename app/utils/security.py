@@ -3,8 +3,6 @@ from builtins import Exception, ValueError, bool, int, str
 import secrets
 import bcrypt
 from logging import getLogger
-import re
-from pydantic import ValidationError
 
 # Set up logging
 logger = getLogger(__name__)
@@ -52,7 +50,13 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         raise ValueError("Authentication process encountered an unexpected error") from e
 
 def generate_verification_token():
-    return secrets.token_urlsafe(16)  # Generates a secure 16-byte URL-safe token
+    """
+    Generates a secure 16-byte URL-safe token for verification purposes.
+    
+    Returns:
+        str: A URL-safe token.
+    """
+    return secrets.token_urlsafe(16)
 
 def validate_password(password: str) -> bool:
     """

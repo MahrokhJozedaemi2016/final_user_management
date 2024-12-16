@@ -5,6 +5,7 @@ from starlette.middleware.cors import CORSMiddleware  # Import the CORSMiddlewar
 from app.database import Database
 from app.dependencies import get_settings
 from app.routers import user_routes
+from app.utils.common import setup_logging
 from app.utils.api_description import getDescription
 app = FastAPI(
     title="User Management",
@@ -32,11 +33,9 @@ app.add_middleware(
 async def startup_event():
     settings = get_settings()
     Database.initialize(settings.database_url, settings.debug)
-
+    setup_logging()
 @app.exception_handler(Exception)
 async def exception_handler(request, exc):
     return JSONResponse(status_code=500, content={"message": "An unexpected error occurred."})
 
 app.include_router(user_routes.router)
-
-
