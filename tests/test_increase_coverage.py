@@ -7,6 +7,18 @@ from pathlib import Path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email_validator import EmailNotValidError
+from fastapi.testclient import TestClient
+from app.main import app
+from unittest.mock import AsyncMock, Mock, patch
+from app.models.user_model import User
+import asyncio
+
+from unittest.mock import AsyncMock, Mock, patch
+from app.services.email_service import EmailService
+from app.models.user_model import User
+from app.utils.template_manager import TemplateManager
+from app.utils.smtp_connection import SMTPClient
+from settings.config import settings
 
 # ---------------- SMTPClient Tests ----------------
 
@@ -76,16 +88,9 @@ def test_apply_email_styles(template_manager):
     assert 'style="font-size: 16px;' in result  # Check p style
 
 
-import pytest
-from unittest.mock import patch, mock_open
-from app.utils.template_manager import TemplateManager
-
-
 @pytest.fixture
 def template_manager():
     return TemplateManager()
-
-
 
 def test_render_template_missing_file(template_manager):
     """Test render_template when a required file is missing."""
@@ -310,8 +315,7 @@ async def test_require_role_invalid():
     assert "Operation not permitted" in exc.value.detail
 
 ###--------------------main tests----------------------------
-from fastapi.testclient import TestClient
-from app.main import app
+
 
 client = TestClient(app)
 
