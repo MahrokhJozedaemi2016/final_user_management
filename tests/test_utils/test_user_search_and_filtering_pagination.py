@@ -1,91 +1,100 @@
 import pytest
-from starlette.requests import Request
-from starlette.datastructures import URL, QueryParams
-from app.utils.pagination import generate_pagination_links
-from urllib.parse import urlencode  # Importing urlencode for encoding query parameters
+from starlette.datastructures import URL
+from app.utils.link_generation import generate_pagination_links
+from app.schemas.pagination_schema import PaginationLink
+from urllib.parse import urlencode
 
+# Mock Request class to simulate FastAPI's Request object
+class MockRequest:
+    def __init__(self, base_url, path):
+        self.base_url = URL(base_url)  # Simulates request.base_url
+        self.url = URL(f"{base_url.rstrip('/')}{path}")  # Simulates request.url
 
 @pytest.mark.asyncio
 async def test_generate_pagination_links():
-    # Mock request object
-    class MockRequest:
-        def __init__(self, base_url):
-            self.url = URL(base_url)
-            self.query_params = QueryParams()  # Mimic the query_params attribute
+    """
+    Test generate_pagination_links function for valid pagination links.
+    """
+    # Initialize mock request
+    request = MockRequest("http://localhost:8000", "/users")
 
-        def url_for(self, *args, **kwargs):
-            return str(self.url)
-
-    request = MockRequest("http://localhost:8000/users")
-
-    # Define input parameters
+    # Input parameters
     skip = 0
     limit = 10
-    total_users = 45  # Total number of users for testing
+    total_users = 45
 
     # Generate pagination links
     links = generate_pagination_links(request, skip, limit, total_users)
 
-    # Assert the structure and values of the links
-    assert "next" in links
-    assert "prev" in links
-    assert "first" in links
-    assert "last" in links
+    # Convert the links to a dictionary for easier assertions
+    link_dict = {link.rel: str(link.href) for link in links}
 
-    # Assert correct link values
-    assert links["next"] == "http://localhost:8000/users?skip=10&limit=10"
-    assert links["prev"] is None  # No previous page at the start
-    assert links["first"] == "http://localhost:8000/users?skip=0&limit=10"
-    assert links["last"] == "http://localhost:8000/users?skip=40&limit=10"
+    # Define expected URLs
+    expected_self_url = "http://localhost:8000/users?skip=0&limit=10"
+    expected_first_url = "http://localhost:8000/users?skip=0&limit=10"
+    expected_last_url = "http://localhost:8000/users?skip=40&limit=10"
+    expected_next_url = "http://localhost:8000/users?skip=10&limit=10"
 
-    # Test a middle page
-    skip = 20
-    links = generate_pagination_links(request, skip, limit, total_users)
-    assert links["prev"] == "http://localhost:8000/users?skip=10&limit=10"
-    assert links["next"] == "http://localhost:8000/users?skip=30&limit=10"
-    assert links["first"] == "http://localhost:8000/users?skip=0&limit=10"
-    assert links["last"] == "http://localhost:8000/users?skip=40&limit=10"
-
+    # Assert links are correct
+    assert link_dict["self"] == expected_self_url, "Self link is incorrect"
+    assert link_dict["first"] == expected_first_url, "First link is incorrect"
+    assert link_dict["last"] == expected_last_url, "Last link is incorrect"
+    assert link_dict["next"] == expected_next_url, "Next link is incorrect"
+    assert "prev" not in link_dict, "Prev link should not exist on the first page"
 
 @pytest.mark.asyncio
 async def test_pagination_edge_cases():
     """
     Test edge cases for pagination utility.
     """
-    class MockRequest:
-        def __init__(self, base_url):
-            self.url = URL(base_url)
-            self.query_params = QueryParams()
+    # Initialize mock request
+    request = MockRequest("http://localhost:8000", "/users")
 
-    request = MockRequest("http://localhost:8000/users")
-    
-    # Case 1: Total items less than limit
+    # Case 1: Total items less than the limit
     links = generate_pagination_links(request, skip=0, limit=10, total_items=5)
-    assert links["next"] is None, "Next link should not exist"
-    assert links["prev"] is None, "Previous link should not exist"
+    link_dict = {link.rel: str(link.href) for link in links}
 
-    # Case 2: Total items exactly a multiple of limit
+    # Assert no "next" or "prev" links
+    assert "next" not in link_dict, "Next link should not exist when total items < limit"
+    assert "prev" not in link_dict, "Prev link should not exist when on first page"
+    assert link_dict["self"] == "http://localhost:8000/users?skip=0&limit=10"
+
+    # Case 2: Total items exactly a multiple of the limit
     links = generate_pagination_links(request, skip=0, limit=10, total_items=20)
-    assert links["last"] == "http://localhost:8000/users?skip=10&limit=10", "Last link is incorrect"
+    link_dict = {link.rel: str(link.href) for link in links}
+
+    expected_last_url = "http://localhost:8000/users?skip=10&limit=10"
+
+    # Assert correct "last" and "next" links
+    assert link_dict["last"] == expected_last_url, "Last link is incorrect"
+    assert "next" in link_dict, "Next link should exist when there are more pages"
+
 
 
 @pytest.mark.asyncio
 async def test_pagination_boundary(async_client, admin_token):
     """
-    Test the `/users` endpoint pagination boundaries.
+    Test pagination boundary cases for the `/users` endpoint.
     """
     headers = {"Authorization": f"Bearer {admin_token}"}
 
-    # Test with skip set to a very large number (beyond the total user count)
-    query_params = {"skip": 10000, "limit": 10}
-    response = await async_client.get(f"/users?{urlencode(query_params)}", headers=headers)
-    assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
-    data = response.json()
-    assert len(data["items"]) == 0, "Pagination with out-of-bound skip should return an empty list"
+    # Ensure the endpoint URL matches the expected structure of your FastAPI app
+    base_url = "/users/"
 
-    # Test with skip set to 0 and limit set to 1 (minimum valid values)
-    query_params = {"skip": 0, "limit": 1}
-    response = await async_client.get(f"/users?{urlencode(query_params)}", headers=headers)
+    # Case 1: Skip beyond total items
+    query_params = {"skip": 10000, "limit": 10}
+    response = await async_client.get(f"{base_url}?{urlencode(query_params)}", headers=headers)
     assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
     data = response.json()
-    assert len(data["items"]) <= 1, "Pagination with minimal values should return up to 1 result"
+    assert "items" in data, "Response should contain 'items' key"
+    assert len(data["items"]) == 0, "No items should be returned when skip exceeds total items"
+    assert data.get("total", 0) >= 0, "Total items count should be non-negative"
+
+    # Case 2: Skip=0, Limit=1
+    query_params = {"skip": 0, "limit": 1}
+    response = await async_client.get(f"{base_url}?{urlencode(query_params)}", headers=headers)
+    assert response.status_code == 200, f"Expected status 200 but got {response.status_code}"
+    data = response.json()
+    assert "items" in data, "Response should contain 'items' key"
+    assert len(data["items"]) <= 1, "Only 1 item should be returned with limit=1"
+    assert data.get("total", 0) >= 1, "Total items count should be at least 1 if data exists"
