@@ -34,5 +34,6 @@ def validate_url_safe_username(username: str) -> bool:
     Returns:
         bool: True if the username is URL-safe, otherwise False.
     """
-    # Allow alphanumeric characters, underscores, and hyphens
+    if not username:  # Handle None or empty strings
+        return False
     return bool(re.match(r'^[a-zA-Z0-9_-]+$', username))
