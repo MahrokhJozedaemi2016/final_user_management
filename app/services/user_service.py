@@ -1,3 +1,4 @@
+
 from fastapi import HTTPException
 from builtins import Exception, bool, classmethod, int, str
 from datetime import datetime, timezone
@@ -103,7 +104,7 @@ class UserService:
            new_user = User(**validated_data)
            
            # Assign role explicitly based on whether it’s the first user
-           new_user.role = UserRole.ADMIN if is_first_user else UserRole.AUTHENTICATED
+           new_user.role = UserRole.ADMIN if is_first_user else UserRole.ANONYMOUS
 
            # Add and commit new user
            new_user.verification_token = generate_verification_token()
@@ -294,51 +295,83 @@ class UserService:
             return user
         return None
 
-
-    @staticmethod
+    @classmethod
     async def search_and_filter_users(
-        session: AsyncSession, 
-        filters: Dict[str, Optional[str]], 
-        skip: int, 
+        cls,
+        session: AsyncSession,
+        filters: Dict[str, Optional[str]],
+        skip: int,
         limit: int
-    ) -> Tuple[List[User], int]:
+    ) -> Tuple[int, List[User]]:
         """
         Search and filter users based on the given criteria.
-
-        :param session: AsyncSession for database access.
-        :param filters: Dictionary of search and filter criteria.
-        :param skip: Pagination offset.
-        :param limit: Number of records to return.
-        :return: A tuple containing the list of users and total count.
         """
         query = select(User)
 
         # Apply filters
         if filters.get("username"):
-            query = query.filter(User.nickname.ilike(f"%{filters['username']}%"))
+            query = query.where(User.nickname.ilike(f"%{filters['username']}%"))
         if filters.get("email"):
-            query = query.filter(User.email.ilike(f"%{filters['email']}%"))
+            query = query.where(User.email.ilike(f"%{filters['email']}%"))
         if filters.get("role"):
-            query = query.filter(User.role == filters["role"])
-        if filters.get("account_status") is not None:
-            query = query.filter(User.email_verified == filters["account_status"])
-        if filters.get("registration_date_start") and filters.get("registration_date_end"):
-            query = query.filter(
-                User.created_at.between(filters["registration_date_start"], filters["registration_date_end"])
-            )
+            query = query.where(User.role == filters["role"])
+        if filters.get("is_locked") is not None:
+            query = query.where(User.is_locked == filters["is_locked"])
+        if filters.get("registration_date_start"):
+            query = query.where(User.created_at >= filters["registration_date_start"])
+        if filters.get("registration_date_end"):
+            query = query.where(User.created_at <= filters["registration_date_end"])
 
-        # Add pagination
-        query = query.offset(skip).limit(limit)
-
-        # Execute the query and count total users
-        result = await session.execute(query)
-        users = result.scalars().all()
-
-        total_query = select(func.count()).select_from(User)
+        # Count total users matching the criteria
+        total_query = select(func.count()).select_from(query.subquery())
         total_result = await session.execute(total_query)
         total_users = total_result.scalar()
 
-        return users, total_users
+        # Add pagination
+        result = await session.execute(query.offset(skip).limit(limit))
+        users = result.scalars().all()
+
+        return total_users, users
+
+
+
+@classmethod
+async def advanced_search_users(cls, session: AsyncSession, filters: Dict) -> Tuple[int, List[User]]:
+    """
+    Perform advanced search based on dynamic filters.
+
+    :param session: AsyncSession for database access.
+    :param filters: Dictionary containing dynamic search filters.
+    :return: A tuple containing the total count and a list of users matching the criteria.
+    """
+    query = select(User)
+
+    # Apply filters dynamically
+    for field, value in filters.items():
+        if field == "username" and value:
+            query = query.where(User.nickname.ilike(f"%{value}%"))
+        elif field == "email" and value:
+            query = query.where(User.email.ilike(f"%{value}%"))
+        elif field == "role" and value:
+            query = query.where(User.role == value)
+        elif field == "is_locked" and value is not None:
+            query = query.where(User.is_locked == value)
+        elif field == "created_from" and value:
+            query = query.where(User.created_at >= value)
+        elif field == "created_to" and value:
+            query = query.where(User.created_at <= value)
+
+    # Count total users matching the criteria
+    total_query = select(func.count()).select_from(query.subquery())
+    total_result = await session.execute(total_query)
+    total_users = total_result.scalar()
+
+    # Add pagination
+    result = await session.execute(query.offset(filters.get("skip", 0)).limit(filters.get("limit", 10)))
+    users = result.scalars().all()
+
+    return total_users, users
+
 
 def generate_unique_nickname(session) -> str:
     while True:
@@ -350,4 +383,17 @@ async def is_nickname_unique(cls, session: AsyncSession, nickname: str) -> bool:
     existing_user = await cls.get_by_nickname(session, nickname)
     return existing_user is None
 
+async def anonymize_user(cls, session: AsyncSession, user_id: UUID):
+    user = await cls.get_by_id(session, user_id)
+    if user:
+        user.anonymize()
+        session.add(user)
+        await session.commit()
+        return user
+    return None
+
+@classmethod
+async def is_nickname_unique(cls, session: AsyncSession, nickname: str) -> bool:
+    existing_user = await cls.get_by_nickname(session, nickname)
+    return existing_user is None
 
