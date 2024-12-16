@@ -1,3 +1,4 @@
+
 from builtins import ValueError, any, bool, str
 from pydantic import BaseModel, EmailStr, Field, validator, root_validator
 from typing import Optional, List
@@ -5,15 +6,15 @@ from datetime import datetime
 from enum import Enum
 import uuid
 import re
+from app.schemas.pagination_schema import PaginationLink
+
 
 from app.utils.nickname_gen import generate_nickname
 from app.utils.security import validate_password
+from app.models.user_model import UserRole
 
-class UserRole(str, Enum):
-    ANONYMOUS = "ANONYMOUS"
-    AUTHENTICATED = "AUTHENTICATED"
-    MANAGER = "MANAGER"
-    ADMIN = "ADMIN"
+
+
 
 def validate_url(url: Optional[str]) -> Optional[str]:
     if url is None:
@@ -123,7 +124,7 @@ class UserResponse(UserBase):
     )  
     role: UserRole = Field(default=UserRole.AUTHENTICATED, example="AUTHENTICATED") 
     is_professional: Optional[bool] = Field(default=False, example=True)
-    
+    is_locked: Optional[bool] = Field(default=False, example=False)  # Add this field
     
     @validator("nickname", pre=True, always=True)
     def validate_nickname_field(cls, value):
@@ -151,7 +152,8 @@ class UserListResponse(BaseModel):
     total: int = Field(..., example=100)
     page: int = Field(..., example=1)
     size: int = Field(..., example=10)
-
+    links: Optional[List[PaginationLink]]  # Accept PaginationLink objects directly
+    filters: Optional["UserSearchFilterRequest"]  # Add filters for better client-side support
 
 class UserSearchParams(BaseModel):
     username: Optional[str] = Field(None, example="john_doe")
@@ -160,8 +162,37 @@ class UserSearchParams(BaseModel):
     account_status: Optional[bool] = Field(None, example=True)
     registration_date_start: Optional[datetime] = Field(None, example="2023-01-01T00:00:00Z")
     registration_date_end: Optional[datetime] = Field(None, example="2023-12-31T23:59:59Z")
-######################
-from pydantic import BaseModel, Field
 
-class UpdateProfilePictureRequest(BaseModel):
-    profile_picture_url: str = Field(..., description="The new profile picture URL.", example="https://example.com/profiles/john_new.jpg")
+class UserSearchFilterRequest(BaseModel):
+    username: Optional[str] = Field(None, example="john_doe")
+    email: Optional[str] = Field(None, example="john.doe@example.com")
+    role: Optional[UserRole] = Field(None, example="ADMIN")
+    is_locked: Optional[bool] = Field(None, example=True)
+    created_from: Optional[datetime] = Field(None, example="2024-01-01T00:00:00")
+    created_to: Optional[datetime] = Field(None, example="2024-12-31T23:59:59")
+    skip: int = Field(0, ge=0, example=0)
+    limit: int = Field(10, gt=0, le=100, example=10)
+
+
+
+class UserSearchQueryRequest(BaseModel):
+    username: Optional[str] = Field(None, example="john_doe", description="Search users by username.")
+    email: Optional[str] = Field(None, example="john.doe@example.com", description="Search users by email.")
+    role: Optional[UserRole] = Field(None, example="ADMIN", description="Filter users by role.")
+    is_locked: Optional[bool] = Field(None, example=False, description="Filter users by account lock status.")
+    skip: int = Field(0, ge=0, example=0, description="Pagination offset.")
+    limit: int = Field(10, gt=0, le=100, example=10, description="Number of records to retrieve.")
+
+from pydantic import BaseModel
+UserListResponse.update_forward_refs()
+UserSearchFilterRequest.update_forward_refs()
+
+
+from pydantic import BaseModel, HttpUrl
+
+class PaginationLink(BaseModel):
+    """
+    Schema for pagination links.
+    """
+    rel: str
+    href: HttpUrl  # Ensure the URL is fully qualified (absolute URL)
