@@ -219,3 +219,4 @@ async def test_advanced_search_users_with_pagination(db_session, users_with_same
 
     assert total == len(users_with_same_role_50_users), "Total users should match all users"
     assert len(users) == 10, "Pagination should limit the results to 10"
+
