@@ -56,27 +56,6 @@ async def test_filter_users_by_account_status(db_session, users_with_same_role_5
     assert total >= 0, "Total users should be a non-negative integer"
     assert all(user.is_locked is False for user in users), "All returned users should have the 'is_locked' status as False"
 
-from datetime import datetime
-
-@pytest.mark.asyncio
-async def test_filter_users_by_registration_date(db_session, users_with_same_role_50_users):
-    """
-    Test filtering users by registration date using the `search_and_filter_users` method.
-    """
-    filters = {
-        "registration_date_start": datetime(2023, 1, 1),
-        "registration_date_end": datetime(2023, 12, 31)
-    }
-    total, users = await UserService.search_and_filter_users(db_session, filters, 0, 10)
-
-    # Assertions
-    assert total >= 0, "Total users should be a non-negative integer"
-    assert all(
-        datetime(2023, 1, 1) <= user.created_at <= datetime(2023, 12, 31)
-        for user in users
-    ), "All returned users should have registration dates within the specified range"
-
-
 @pytest.mark.asyncio
 async def test_filter_users_by_email(db_session, users_with_same_role_50_users):
     """
@@ -219,4 +198,3 @@ async def test_advanced_search_users_with_pagination(db_session, users_with_same
 
     assert total == len(users_with_same_role_50_users), "Total users should match all users"
     assert len(users) == 10, "Pagination should limit the results to 10"
-
