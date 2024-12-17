@@ -571,8 +571,6 @@ Only users matching the specified filters should be returned.
 - Importance:            
 Verifies that the API handles search parameters correctly and filters the user list as expected.             
 
-
-
 3. # test_combination_of_filters:
 
 - Purpose:
