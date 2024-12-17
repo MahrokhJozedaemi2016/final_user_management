@@ -487,34 +487,45 @@ This update addresses challenges in the /login logic, improves the Swagger authe
 
 # FEATURE: Search and Filtering Capabilities for User Management           
 ## Description:        
-This feature enables administrators to search and filter users based on various criteria, such as username, email, role, account status, and registration date range. It supports pagination for easier navigation through large datasets.              
+This feature allows administrators to search and filter users based on various criteria, such as username, email, role, account status (locked/unlocked), and registration date range. The system supports both basic search using query parameters and advanced search using dynamic JSON filters. Results are paginated for efficient navigation, and dynamic pagination links (next, prev, first, last) are provided to enhance usability.           
+
+The implementation adheres to RESTful principles and offers clean, discoverable API responses. It also lays the groundwork for future enhancements like full-text search using ElasticSearch and user-friendly frontend integration.                         
 
 ## User Story:       
 As an administrator, I want to be able to:           
 
 1. Search for users by username, email, or role.          
 2. Filter users based on account status or registration date range.        
-3. Navigate through filtered results using pagination.         
+3. Navigate through filtered results using pagination.       
+4. Perform advanced searches with multiple dynamic filters for flexibility.       
+
 
 ## Viable Features:        
-1. Add search functionality by username, email, and role.           
-2. Implement filtering options for account status and registration date range.              
-3. Update the user management API endpoints to support search and filtering.          
-4. Integrate pagination for efficient navigation.         
-
-for implementing this feature all of these steps are done: 
+1. Search Functionality: Search for users using username, email, and role.         
+2. Filtering Options: Filter users based on account status and registration date range.    
+3. Advanced Search: Allow dynamic filter combinations with JSON input.        
+4. Pagination: Integrate offset-based pagination with navigation links (next, prev, first, last).        
+5. Clean API Responses: Return user-friendly and discoverable API responses.           
 
 1. # Routes (user_routes.py)      
 ## Title:               
 Define the Search and Filtering Endpoint.           
 
 ## Description:        
-This section adds a new /users endpoint in the user_routes.py file. The endpoint accepts query parameters to filter users based on specified criteria.                
+Two endpoints are introduced in user_routes.py for user search and filtering:
+1. /users-basic (GET): Supports simple searches using query parameters.           
+2. /users-advanced (POST): Provides advanced search capabilities by accepting a JSON request body for multiple filters.              
+These endpoints leverage schemas for input validation, dynamic filtering logic, and pagination utilities to return efficient and clean responses.        
 
 ## Expected outcome:          
-The /users endpoint should:              
-1. Accept query parameters like username, email, role, account_status, and date range.                  
-2. Return filtered results as a paginated response.            
+1. Basic Search (/users-basic):         
+- Accepts query parameters like username, email, role, is_locked, and pagination (skip, limit).    
+- Returns paginated user data with dynamic pagination links.         
+
+2. Advanced Search (/users-advanced):         
+- Accepts a JSON body with filters: created_from, created_to, role, is_locked, etc.       
+- Dynamically applies multiple filters to query users efficiently.                  
+- Returns paginated results with metadata and the original filters for clarity.                
 
 ## Resolution Steps:        
 - Added the /users endpoint with the necessary query parameters.            
