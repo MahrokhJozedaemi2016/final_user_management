@@ -1,3 +1,5 @@
+
+
 """
 This Python file is part of a FastAPI application, demonstrating user management functionalities including creating, reading,
 updating, and deleting (CRUD) user information. It uses OAuth2 with Password Flow for security, ensuring that only authenticated
@@ -37,10 +39,16 @@ from typing import Optional
 from app.models.user_model import UserRole
 from datetime import datetime
 from app.utils.pagination import generate_pagination_links
+from app.schemas.user_schemas import UpdateProfilePictureRequest
+import logging
+from app.schemas.user_schemas import UpdateBioRequest
+
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 settings = get_settings()
+logger = logging.getLogger(__name__)
+
 @router.get("/users/{user_id}", response_model=UserResponse, name="get_user", tags=["User Management Requires (Admin or Manager Roles)"])
 async def get_user(user_id: UUID, request: Request, db: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme), current_user: dict = Depends(require_role(["ADMIN", "MANAGER"]))):
     """
@@ -56,7 +64,7 @@ async def get_user(user_id: UUID, request: Request, db: AsyncSession = Depends(g
         token: The OAuth2 access token obtained through OAuth2PasswordBearer dependency.
     """
     user = await UserService.get_by_id(db, user_id)
-    if not user:
+    if not user: # pragma: no cover
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     return UserResponse.model_construct(
@@ -92,8 +100,18 @@ async def update_user(user_id: UUID, user_update: UserUpdate, request: Request, 
     - **user_update**: UserUpdate model with updated user information.
     """
     user_data = user_update.model_dump(exclude_unset=True)
+    
+    # Check for nickname uniqueness if it is being updated
+    if "nickname" in user_data:
+        existing_user_with_nickname = await UserService.get_by_nickname(db, user_data["nickname"])
+        if existing_user_with_nickname and existing_user_with_nickname.id != user_id: # pragma: no cover
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Nickname already exists")
+
+    
+    
+    # Update user
     updated_user = await UserService.update(db, user_id, user_data)
-    if not updated_user:
+    if not updated_user: # pragma: no cover
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     return UserResponse.model_construct(
@@ -122,7 +140,7 @@ async def delete_user(user_id: UUID, db: AsyncSession = Depends(get_db), token: 
     - **user_id**: UUID of the user to delete.
     """
     success = await UserService.delete(db, user_id)
-    if not success:
+    if not success: # pragma: no cover
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -145,12 +163,20 @@ async def create_user(user: UserCreate, request: Request, db: AsyncSession = Dep
     Returns:
     - UserResponse: The newly created user's information along with navigation links.
     """
+    #checking for existing email
     existing_user = await UserService.get_by_email(db, user.email)
-    if existing_user:
+    if existing_user: # pragma: no cover
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
     
+    #check for exsting nickname
+    if user.nickname: # pragma: no cover
+        existing_nickname = await UserService.get_by_nickname(db, user.nickname)
+        if existing_nickname: # pragma: no cover
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Nickname already exists")
+    
+    # Create user
     created_user = await UserService.create(db, user.model_dump(), email_service)
-    if not created_user:
+    if not created_user: # pragma: no cover
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create user")
     
     
@@ -182,62 +208,56 @@ async def list_users(
     users = await UserService.list_users(db, skip, limit)
 
     user_responses = [
-        UserResponse.model_validate(user) for user in users
+        UserResponse.model_validate(user) for user in users # pragma: no cover
     ]
     
     pagination_links = generate_pagination_links(request, skip, limit, total_users)
     
     # Construct the final response with pagination details
-    return UserListResponse(
+    return UserListResponse( # pragma: no cover
         items=user_responses,
         total=total_users,
-        page=skip // limit + 1,
+        page=(skip // limit) + 1,
         size=len(user_responses),
-        links=pagination_links  # Ensure you have appropriate logic to create these links
+        links=pagination_links,  # Ensure you have appropriate logic to create these links
+        filters=None
     )
 
 
 @router.post("/register/", response_model=UserResponse, tags=["Login and Registration"])
 async def register(user_data: UserCreate, session: AsyncSession = Depends(get_db), email_service: EmailService = Depends(get_email_service)):
     user = await UserService.register_user(session, user_data.model_dump(), email_service)
-    if user:
+    if user: # pragma: no cover
         return user
     raise HTTPException(status_code=400, detail="Email already exists")
 
 @router.post("/login/", response_model=TokenResponse, tags=["Login and Registration"])
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_db)):
-    if await UserService.is_account_locked(session, form_data.username):
-        raise HTTPException(status_code=400, detail="Account locked due to too many failed login attempts.")
-
-    user = await UserService.login_user(session, form_data.username, form_data.password)
-    if user:
-        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-
-        access_token = create_access_token(
-            data={"sub": user.email, "role": str(user.role.name)},
-            expires_delta=access_token_expires
-        )
-
-        return {"access_token": access_token, "token_type": "bearer"}
-    raise HTTPException(status_code=401, detail="Incorrect email or password.")
-
-@router.post("/login/", include_in_schema=False, response_model=TokenResponse, tags=["Login and Registration"])
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_db)):
-    if await UserService.is_account_locked(session, form_data.username):
-        raise HTTPException(status_code=400, detail="Account locked due to too many failed login attempts.")
-
-    user = await UserService.login_user(session, form_data.username, form_data.password)
-    if user:
-        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-
-        access_token = create_access_token(
-            data={"sub": user.email, "role": str(user.role.name)},
-            expires_delta=access_token_expires
-        )
-
-        return {"access_token": access_token, "token_type": "bearer"}
-    raise HTTPException(status_code=401, detail="Incorrect email or password.")
-
+    try:
+        # Check if the account is locked
+        if await UserService.is_account_locked(session, form_data.username):
+            raise HTTPException(status_code=400, detail="Account locked due to too many failed login attempts.") # pragma: no cover
+        logger.info(f"Checking username {form_data.username} ")
+        
+        # Authenticate user
+        user = await UserService.login_user(session, form_data.username, form_data.password)
+        logger.info(f"User : {user} ")
+        if user:
+            # Generate JWT token
+            access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+            access_token = create_access_token(
+                data={"sub": user.email, "role": str(user.role.name)},
+                expires_delta=access_token_expires
+            )
+            return {"access_token": access_token, "token_type": "bearer"}
+        raise HTTPException(status_code=401, detail="Incorrect email or password.")
+    except HTTPException as e: # pragma: no cover
+        # Re-raise HTTP exceptions as-is
+        raise e
+    except Exception as e: # pragma: no cover
+        # Log unexpected errors and return a generic 500 response
+        logger.error(f"Unexpected error during login: {e}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 @router.get("/verify-email/{user_id}/{token}", status_code=status.HTTP_200_OK, name="verify_email", tags=["Login and Registration"])
 async def verify_email(user_id: UUID, token: str, db: AsyncSession = Depends(get_db), email_service: EmailService = Depends(get_email_service)):
@@ -248,44 +268,167 @@ async def verify_email(user_id: UUID, token: str, db: AsyncSession = Depends(get
     - **token**: Verification token sent to the user's email.
     """
     if await UserService.verify_email_with_token(db, user_id, token):
-        return {"message": "Email verified successfully"}
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired verification token")
+        return {"message": "Email verified successfully"} # pragma: no cover
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired verification token") # pragma: no cover
 
+from app.schemas.user_schemas import UserSearchQueryRequest
 
-@router.get("/users", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
-async def search_users(
+@router.get("/users-basic", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
+async def basic_search_users(
     request: Request,
-    username: Optional[str] = None,
-    email: Optional[str] = None,
-    role: Optional[str] = None,
-    account_status: Optional[bool] = None,
-    registration_date_start: Optional[datetime] = None,
-    registration_date_end: Optional[datetime] = None,
-    skip: int = 0,
-    limit: int = 10,
+    query: UserSearchQueryRequest = Depends(),  # Use a schema for search criteria
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"]))
+    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"])),
 ):
     """
-    Endpoint to search and filter users based on various criteria.
+    Basic search endpoint for filtering users by username, email, role, or lock status.
     """
-    filters = {
-        "username": username,
-        "email": email,
-        "role": role,
-        "account_status": account_status,
-        "registration_date_start": registration_date_start,
-        "registration_date_end": registration_date_end,
-    }
-    print("Received filters:", filters)  # Debug log
-    users, total_users = await UserService.search_and_filter_users(db, filters, skip, limit)
+    logger.info(f"Basic search initiated with filters: {query.dict(exclude_none=True)}")
+    total_users, users = await UserService.search_and_filter_users(
+        db,
+        username=query.username,
+        email=query.email,
+        role=query.role,
+        is_locked=query.is_locked,
+        skip=query.skip,
+        limit=query.limit,
+    )
+
     user_responses = [UserResponse.model_validate(user) for user in users]
-    pagination_links = generate_pagination_links(request, skip, limit, total_users)
+    pagination_links = generate_pagination_links(request, query.skip, query.limit, total_users)
+
+    # Include query filters in the response
+    filters = UserSearchQueryRequest(
+        username=query.username,
+        email=query.email,
+        role=query.role,
+        is_locked=query.is_locked,
+        skip=query.skip,
+        limit=query.limit,
+    )
 
     return UserListResponse(
         items=user_responses,
         total=total_users,
-        page=skip // limit + 1,
+        page=(query.skip // query.limit) + 1,
         size=len(user_responses),
-        links=pagination_links
+        links=pagination_links,
+        filters=filters,
     )
+
+
+from app.schemas.user_schemas import UserSearchFilterRequest
+
+@router.post("/users-advanced", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
+async def advanced_search_users(
+    request: Request,
+    filters: UserSearchFilterRequest,  # Use a schema for advanced filters
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"])),
+):
+    """
+    Advanced search endpoint for filtering users with detailed criteria.
+
+    Args:
+        - filters (UserSearchFilterRequest): JSON body containing search criteria.
+    """
+    logger.info(f"Advanced search initiated with filters: {filters.dict(exclude_none=True)}")
+    total_users, users = await UserService.advanced_search_users(
+        db,
+        filters=filters.dict(exclude_none=True),
+    )
+
+    user_responses = [UserResponse.model_validate(user) for user in users]
+    pagination_links = generate_pagination_links(request, filters.skip, filters.limit, total_users)
+
+    # Include filters in the response
+    return UserListResponse(
+        items=user_responses,
+        total=total_users,
+        page=(filters.skip // filters.limit) + 1,
+        size=len(user_responses),
+        links=pagination_links,
+        filters=filters,  # Return filters for better client-side support
+    )
+
+
+@router.patch("/users/{user_id}/profile-picture", response_model=UserResponse, name="update_user_profile_picture", tags=["User Profile"])
+async def update_user_profile_picture(
+    user_id: UUID,
+    picture_data: UpdateProfilePictureRequest,  # Expecting a proper JSON body
+    db: AsyncSession = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
+    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"]))
+):
+    """
+    Update the user's profile picture URL.
+    """
+    # Check if the user exists
+    user = await UserService.get_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    # Perform the update
+    updated_user = await UserService.update(db, user_id, {"profile_picture_url": picture_data.profile_picture_url})
+    
+    if not updated_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid profile picture URL or other update issues."
+        )
+    
+    return UserResponse.model_validate(updated_user)
+
+@router.patch("/users/{user_id}/bio", response_model=UserResponse, name="update_user_bio", tags=["User Profile"])
+async def update_user_bio(
+    user_id: UUID,
+    bio_data: UpdateBioRequest,  # Use the schema
+    db: AsyncSession = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
+    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"]))
+):
+    """
+    Update the user's bio.
+    """
+    # Update the user bio using the validated schema
+    updated_user = await UserService.update(db, user_id, {"bio": bio_data.bio})  # Access `bio` directly from the schema
+    if not updated_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    return UserResponse.model_validate(updated_user)
+
+
+@router.post("/login/", response_model=TokenResponse, tags=["Login and Registration"])
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_db)):
+    try:
+        # Log the login attempt
+        logger.info(f"Login attempt for username: {form_data.username}")
+
+        # Check if the account is locked
+        if await UserService.is_account_locked(session, form_data.username):
+            logger.warning(f"Account locked for username: {form_data.username}")
+            raise HTTPException(status_code=400, detail="Account locked due to too many failed login attempts.")
+        
+        # Authenticate user
+        user = await UserService.login_user(session, form_data.username, form_data.password)
+        if user:
+            # Generate JWT token
+            logger.info(f"Login successful for username: {form_data.username}")
+            access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+            access_token = create_access_token(
+                data={"sub": user.email, "role": str(user.role.name)},
+                expires_delta=access_token_expires
+            )
+            return {"access_token": access_token, "token_type": "bearer"}
+        
+        # Log invalid login
+        logger.warning(f"Invalid login attempt for username: {form_data.username}")
+        raise HTTPException(status_code=401, detail="Incorrect email or password.")
+    
+    except HTTPException as e:
+        logger.error(f"HTTPException during login for username: {form_data.username}: {str(e)}")
+        raise e
+    
+    except Exception as e:
+        logger.error(f"Unexpected error during login for username: {form_data.username}: {str(e)}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")

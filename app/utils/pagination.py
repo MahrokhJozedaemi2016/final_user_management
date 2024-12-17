@@ -1,53 +1,26 @@
-from typing import Any, Dict
-from urllib.parse import urlencode
-from starlette.datastructures import URL
 
+from typing import List
+from fastapi import Request
+from app.schemas.pagination_schema import PaginationLink
+from app.utils.link_generation import create_pagination_link
 
-def generate_pagination_links(
-    request: Any, skip: int, limit: int, total_items: int
-) -> Dict[str, str]:
+def generate_pagination_links(request: Request, skip: int, limit: int, total_items: int) -> List[PaginationLink]:
     """
     Generate pagination links for API responses.
-
-    :param request: The request object to extract the base URL.
-    :param skip: The current skip (offset) value.
-    :param limit: The current limit (number of items per page).
-    :param total_items: Total number of items available.
-    :return: A dictionary containing 'next', 'prev', 'first', and 'last' links.
     """
-    base_url = str(request.url).split("?")[0]
-    query_params = dict(request.query_params)  # Convert to mutable dictionary
+    base_url = str(request.url)  # Use the complete URL from the request
+    total_pages = (total_items + limit - 1) // limit
 
-    # Calculate the next page link
+    links = [
+        create_pagination_link("self", base_url, {"skip": skip, "limit": limit}),
+        create_pagination_link("first", base_url, {"skip": 0, "limit": limit}),
+        create_pagination_link("last", base_url, {"skip": max(0, (total_pages - 1) * limit), "limit": limit}),
+    ]
+
     if skip + limit < total_items:
-        query_params["skip"] = skip + limit
-        query_params["limit"] = limit
-        next_link = f"{base_url}?{urlencode(query_params)}"
-    else:
-        next_link = None
+        links.append(create_pagination_link("next", base_url, {"skip": skip + limit, "limit": limit}))
 
-    # Calculate the previous page link
-    if skip - limit >= 0:
-        query_params["skip"] = max(skip - limit, 0)
-        query_params["limit"] = limit
-        prev_link = f"{base_url}?{urlencode(query_params)}"
-    else:
-        prev_link = None
+    if skip > 0:
+        links.append(create_pagination_link("prev", base_url, {"skip": max(skip - limit, 0), "limit": limit}))
 
-    # Calculate the first page link
-    query_params["skip"] = 0
-    query_params["limit"] = limit
-    first_link = f"{base_url}?{urlencode(query_params)}"
-
-    # Calculate the last page link
-    last_page_skip = (total_items - 1) // limit * limit
-    query_params["skip"] = last_page_skip
-    query_params["limit"] = limit
-    last_link = f"{base_url}?{urlencode(query_params)}"
-
-    return {
-        "next": next_link,
-        "prev": prev_link,
-        "first": first_link,
-        "last": last_link,
-    }
+    return links
