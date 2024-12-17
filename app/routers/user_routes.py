@@ -270,68 +270,84 @@ async def verify_email(user_id: UUID, token: str, db: AsyncSession = Depends(get
         return {"message": "Email verified successfully"} # pragma: no cover
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired verification token") # pragma: no cover
 
+from app.schemas.user_schemas import UserSearchQueryRequest
+
 @router.get("/users-basic", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
 async def basic_search_users(
     request: Request,
-    username: Optional[str] = None,
-    email: Optional[str] = None,
-    skip: int = 0,
-    limit: int = 10,
+    query: UserSearchQueryRequest = Depends(),  # Use a schema for search criteria
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"]))
+    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"])),
 ):
     """
-    Basic search endpoint for filtering users by username or email.
+    Basic search endpoint for filtering users by username, email, role, or lock status.
     """
-    filters = {
-        "username": username, # pragma: no cover
-        "email": email, # pragma: no cover
-    }
-    print("Received basic search filters:", filters)  # pragma: no cover
-    users, total_users = await UserService.search_and_filter_users(db, filters, skip, limit)
-    user_responses = [UserResponse.model_validate(user) for user in users]
-    pagination_links = generate_pagination_links(request, skip, limit, total_users)
+    logger.info(f"Basic search initiated with filters: {query.dict(exclude_none=True)}")
+    total_users, users = await UserService.search_and_filter_users(
+        db,
+        username=query.username,
+        email=query.email,
+        role=query.role,
+        is_locked=query.is_locked,
+        skip=query.skip,
+        limit=query.limit,
+    )
 
-    
-    
-    
-    return UserListResponse( # pragma: no cover
+    user_responses = [UserResponse.model_validate(user) for user in users]
+    pagination_links = generate_pagination_links(request, query.skip, query.limit, total_users)
+
+    # Include query filters in the response
+    filters = UserSearchQueryRequest(
+        username=query.username,
+        email=query.email,
+        role=query.role,
+        is_locked=query.is_locked,
+        skip=query.skip,
+        limit=query.limit,
+    )
+
+    return UserListResponse(
         items=user_responses,
         total=total_users,
-        page=skip // limit + 1,
+        page=(query.skip // query.limit) + 1,
         size=len(user_responses),
-        links=pagination_links
+        links=pagination_links,
+        filters=filters,
     )
+
+
+from app.schemas.user_schemas import UserSearchFilterRequest
 
 @router.post("/users-advanced", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
 async def advanced_search_users(
     request: Request,
-    filters: dict,
-    skip: int = 0,
-    limit: int = 10,
+    filters: UserSearchFilterRequest,  # Use a schema for advanced filters
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"]))
+    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"])),
 ):
     """
     Advanced search endpoint for filtering users with detailed criteria.
 
     Args:
-        - filters (dict): JSON body containing search criteria.
-        - skip (int): Number of records to skip for pagination.
-        - limit (int): Number of records to retrieve for pagination.
+        - filters (UserSearchFilterRequest): JSON body containing search criteria.
     """
-    print("Received advanced search filters:", filters)  # pragma: no cover
-    users, total_users = await UserService.search_and_filter_users(db, filters, skip, limit)
-    user_responses = [UserResponse.model_validate(user) for user in users]
-    pagination_links = generate_pagination_links(request, skip, limit, total_users)
+    logger.info(f"Advanced search initiated with filters: {filters.dict(exclude_none=True)}")
+    total_users, users = await UserService.advanced_search_users(
+        db,
+        filters=filters.dict(exclude_none=True),
+    )
 
-    return UserListResponse( # pragma: no cover
+    user_responses = [UserResponse.model_validate(user) for user in users]
+    pagination_links = generate_pagination_links(request, filters.skip, filters.limit, total_users)
+
+    # Include filters in the response
+    return UserListResponse(
         items=user_responses,
         total=total_users,
-        page=skip // limit + 1,
+        page=(filters.skip // filters.limit) + 1,
         size=len(user_responses),
         links=pagination_links,
-        filters=filters
+        filters=filters,  # Return filters for better client-side support
     )
 
 
