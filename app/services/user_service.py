@@ -318,14 +318,12 @@ class UserService:
         if filters.get("is_locked") is not None:
             query = query.where(User.is_locked == filters["is_locked"])
         if filters.get("registration_date_start"):
-            query = query.where(User.created_at >= filters["registration_date_start"])
+            query = query.where(User.created_at >= filters["created_from"])
         if filters.get("registration_date_end"):
-            query = query.where(User.created_at <= filters["registration_date_end"])
+            query = query.where(User.created_at <= filters["created_to"])
 
         # Count total users matching the criteria
-        total_query = select(func.count()).select_from(query.subquery())
-        total_result = await session.execute(total_query)
-        total_users = total_result.scalar()
+        total_users = (await session.execute(select(func.count()).select_from(query.subquery()))).scalar()
 
         # Add pagination
         result = await session.execute(query.offset(skip).limit(limit))
@@ -367,7 +365,9 @@ class UserService:
         total_users = total_result.scalar()
 
         # Add pagination
-        result = await session.execute(query.offset(filters.get("skip", 0)).limit(filters.get("limit", 10)))
+        skip = filters.get("skip", 0)
+        limit = filters.get("limit", 10)
+        result = await session.execute(query.offset(skip).limit(limit))
         users = result.scalars().all()
 
         return total_users, users
@@ -399,4 +399,36 @@ class UserService:
         existing_user = await cls.get_by_nickname(session, nickname) # pragma: no cover
         return existing_user is None # pragma: no cover
 
+import pytest
+from datetime import datetime, timedelta, timezone
+@pytest.mark.asyncio
+async def test_combination_of_date_range_and_other_filters(db_session, users_with_same_role_50_users):
+    """
+    Test filtering users by a combination of date range and other filters.
+    """
+    # Use timezone-aware datetimes for the date range
+    created_from = datetime.now(timezone.utc) - timedelta(days=30)
+    created_to = datetime.now(timezone.utc)
+
+    # Pick a user dynamically for additional filters
+    target_user = users_with_same_role_50_users[0]
+
+    filters = {
+        "created_from": created_from,
+        "created_to": created_to,
+        "username": target_user.nickname[:3],  # Partial match
+        "role": target_user.role.name,        # Exact role match
+    }
+
+    # Call the service method
+    total, users = await UserService.advanced_search_users(db_session, filters)
+
+    # Assertions
+    assert total > 0, "Total users should be greater than 0"
+    assert all(
+        created_from <= user.created_at <= created_to and
+        target_user.nickname[:3].lower() in user.nickname.lower() and
+        user.role.name == target_user.role.name
+        for user in users
+    ), "All returned users should match the date range and other filters"
 
