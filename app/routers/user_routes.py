@@ -432,3 +432,4 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), session: Async
     except Exception as e:
         logger.error(f"Unexpected error during login for username: {form_data.username}: {str(e)}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+

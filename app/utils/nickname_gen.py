@@ -12,3 +12,4 @@ def generate_nickname(separator: str = "-") -> str:
     number = random.randint(100, 999)  # Ensures 3-digit format for uniqueness
     
     return f"{random.choice(words)}{separator}{random.choice(nouns)}{separator}{number}"
+

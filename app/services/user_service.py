@@ -432,3 +432,4 @@ async def test_combination_of_date_range_and_other_filters(db_session, users_wit
         user.role.name == target_user.role.name
         for user in users
     ), "All returned users should match the date range and other filters"
+
