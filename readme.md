@@ -1,5 +1,5 @@
 
-# Overview
+# Overview       
 The User Management System is a robust, scalable application designed to streamline user management processes with advanced features and best practices. Developed as part of an open-source project led by Professor Keith Williams at NJIT, this project serves as a bridge between professional software development practices and student learning experiences.            
 
 The system implements core functionalities for managing user data, enforcing security policies, and providing administrators with tools to efficiently search, filter, and validate user records. It is designed to be extensible, following modern development principles like CI/CD automation, secure authentication, and comprehensive testing.            
