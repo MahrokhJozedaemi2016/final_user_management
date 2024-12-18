@@ -1,10 +1,124 @@
 
+# Overview
+The User Management System is a robust, scalable application designed to streamline user management processes with advanced features and best practices. Developed as part of an open-source project led by Professor Keith Williams at NJIT, this project serves as a bridge between professional software development practices and student learning experiences.            
 
-# The User Management System Final Project: Your Epic Coding Adventure Awaits! 🎉✨🔥
+The system implements core functionalities for managing user data, enforcing security policies, and providing administrators with tools to efficiently search, filter, and validate user records. It is designed to be extensible, following modern development principles like CI/CD automation, secure authentication, and comprehensive testing.            
 
-## Introduction: Buckle Up for the Ride of a Lifetime 🚀🎬
+## Technical Stack        
+- Backend Framework: FastAPI (Python)       
+- Database: PostgreSQL        
+- Containerization: Docker         
+- CI/CD: GitHub Actions         
+- Testing Tools: Pytest         
+- Authentication: JWT (JSON Web Token)          
+- Code Style: PEP8-compliant with strong typing and linting       
 
-Welcome to the User Management System project - an epic open-source adventure crafted by the legendary Professor Keith Williams for his rockstar students at NJIT! 🏫👨‍🏫⭐ This project is your gateway to coding glory, providing a bulletproof foundation for a user management system that will blow your mind! 🤯 You'll bridge the gap between the realms of seasoned software pros and aspiring student developers like yourselves. 
+## Project Goals       
+The primary goal of this project is to implement a production-ready User Management System that adheres to best practices for security, scalability, and maintainability. It focuses on empowering administrators with tools to manage users efficiently while providing a secure and user-friendly experience for end users.         
+
+The Search and Filtering Capabilities feature highlights the project's ability to combine advanced search functionality with dynamic filters, pagination, and rigorous testing for performance optimization.       
+
+## Learning Outcomes           
+Hands-on experience with FastAPI and modern Python development.
+Practical knowledge of CI/CD pipelines and Dockerization for seamless deployment.         
+Advanced understanding of data validation, password security, and robust error handling.           
+Implementation of real-world testing scenarios, including edge case handling and comprehensive coverage.           
+
+## Project Status        
+This project successfully delivered the following milestones:        
+
+1. Resolution of critical issues related to security, validation, and system behavior.         
+2. Implementation of advanced features like search, filtering, and role-based management.          
+3. Full test coverage across layers with detailed reporting.         
+
+## How to Get Started         
+- Clone the repository:
+
+```python 
+git clone https://github.com/MahrokhJozedaemi2016/final_user_management.git
+cd final_user_management
+```
+- Run the project with Docker:         
+```python
+docker-compose up --build
+```   
+
+## Reflection file:      
+[**Project Reflection**](Reflection.md)            
+       
+
+## Docker Repository and Image Overview        
+The Docker image for this project is hosted on Docker Hub.          
+
+**Docker Hub Repository** 
+[**View the Repository on Docker Hub**](https://hub.docker.com/r/mahrokhjozedaemi/final_user_management/tags)         
+
+**Image Overview**  
+![Docker Image Overview](images/Docker_image.jpg)          
+
+
+# link to issues:             
+## Issue 1: Fix Docker Build Error Related to libc-bin Version Constraint:          
+[Issue 1: Fix Docker Build Error](https://github.com/MahrokhJozedaemi2016/final_user_management/issues/1)        
+
+## Issue 2: CI/CD Pipeline Update for GitHub Actions:      
+[CI/CD Pipeline Update for GitHub Actions](https://github.com/MahrokhJozedaemi2016/final_user_management/issues/3)        
+
+## Issue 3:  Implement Robust Username Generation and Validation for Enhanced User Management             
+[Implement Robust Username Generation and Validation for Enhanced User Management](https://github.com/MahrokhJozedaemi2016/final_user_management/issues/7)         
+
+## Issue 4 : Password Validation and Security Enhancements     
+[Password Validation and Security Enhancements](https://github.com/MahrokhJozedaemi2016/final_user_management/issues/11)       
+
+## Issue 5: User Uniqueness Validation      
+[User Uniqueness Validation](https://github.com/MahrokhJozedaemi2016/final_user_management/issues/13)       
+
+## Issue 6:  Automatically Assign Admin Role to First Registered User     
+[Automatically Assign Admin Role to First Registered User](https://github.com/MahrokhJozedaemi2016/final_user_management/issues/15)        
+
+## Issue 7: User Bio Update Validation and Error Handling        
+[User Bio Update Validation and Error Handling](https://github.com/MahrokhJozedaemi2016/final_user_management/issues/17)      
+
+## Issue 8: Ensure Admin User Exists and Streamline /login Authentication Logic           
+ [Ensure Admin User Exists and Streamline /login Authentication Logic](https://github.com/MahrokhJozedaemi2016/final_user_management/issues/19)         
+
+ ## Feature: Search and Filtering Capabilities for User Management       
+[Search and Filtering Capabilities for User Management](https://github.com/MahrokhJozedaemi2016/final_user_management/issues/8)      
+
+## link to Search and Filtering Capabilities branch:        
+[Search and Filtering Capabilities For User Management](https://github.com/MahrokhJozedaemi2016/final_user_management/tree/feature/advanced-search-and-filter)      
+
+## link to Fix Docker Build Error Related to libc-bin Version Constraint branch:       
+[Fix Docker Build Error Related to libc-bin Version Constraint](https://github.com/MahrokhJozedaemi2016/final_user_management/tree/fix-docker-compose-build-error)       
+
+## Link to CI/CD Pipeline Update for GitHub Actions branch             
+[CI/CD Pipeline Update for GitHub Actions](https://github.com/MahrokhJozedaemi2016/final_user_management/tree/edit-production-yml-for-ci-cd)      
+
+## link to Implement Robust Username Generation and Validation for Enhanced User Management branch             
+[Implement Robust Username Generation and Validation for Enhanced User Management](https://github.com/MahrokhJozedaemi2016/final_user_management/tree/User-Validation)        
+
+## Link to Password Validation and Security Enhancements branch          
+[Password Validation and Security Enhancements](https://github.com/MahrokhJozedaemi2016/final_user_management/tree/Password-validation)
+
+## Link to User Uniqueness Validation branch           
+[User Uniqueness Validation](https://github.com/MahrokhJozedaemi2016/final_user_management/tree/ensure-username-uniqueness)         
+
+## Link to Automatically Assign Admin Role to First Registered User branch             
+[Automatically Assign Admin Role to First Registered User](https://github.com/MahrokhJozedaemi2016/final_user_management/tree/feature-first-user-admin)        
+
+## Link User Bio Update Validation and Error Handling branch      
+[User Bio Update Validation and Error Handling](https://github.com/MahrokhJozedaemi2016/final_user_management/tree/user-profile-updates)         
+
+## Link to Ensure Admin User Exists and Streamline /login Authentication Logic branch      
+[Ensure Admin User Exists and Streamline /login Authentication Logic](https://github.com/MahrokhJozedaemi2016/final_user_management/tree/fix/admin-login-swagger)       
+
+## Tests for Search and Filtering Capabilities for User Management    
+## API Layer Tests    
+[API Layer Tests](https://github.com/MahrokhJozedaemi2016/final_user_management/blob/main/tests/test_api/test_user_search_and_filtering.py): Tests related to API endpoint functionality.           
+## Service Layer Tests       
+[Service Layer Tests](https://github.com/MahrokhJozedaemi2016/final_user_management/blob/main/tests/test_services/test_user_search_and_filtering_service.py): Tests the service layer logic for filtering and searching users.         
+## Pagination Utility Tests     
+[Pagination Tests](https://github.com/MahrokhJozedaemi2016/final_user_management/blob/main/tests/test_utils/test_user_search_and_filtering_pagination.py): Validates pagination logic for user search results.         
 
 # ISSUE: Fix Docker Build Error Related to libc-bin Version Constraint    
 ## Description:    
@@ -37,6 +151,9 @@ Users can run the following command to build and run the application successfull
 ```python
 docker compose up --build
 ```
+## output of Pytest:      
+![Before Implementing](images/before%20implementing.jpg)            
+
 ## Files Updated:      
 1. Dockerfile         
 - Removed the specific version constraint for libc-bin.            
@@ -85,11 +202,11 @@ mahrokhjozedaemi/final_user_management.
 
 ## Files Updated           
 - .github/workflows/production.yml          
-Updated DockerHub repository name.       
-Enabled multi-platform support.         
-Added Trivy vulnerability scanning with caching.          
+- Updated DockerHub repository name.           
+- Enabled multi-platform support.            
+- Added Trivy vulnerability scanning with caching.             
 
-# IISUE: Implement Robust Username Generation and Validation for Enhanced User Management            
+# ISSUE: Implement Robust Username Generation and Validation for Enhanced User Management            
 
 ## Description:
 This section of the project implements robust username management features designed to enhance user experience and ensure data integrity. The implementation supports the automatic generation of unique, URL-safe nicknames for users during creation while allowing users to change their nicknames with validation. It enforces strict uniqueness and format constraints, ensuring compatibility with public-facing identifiers. This functionality improves user anonymity and privacy by assigning meaningful, anonymous nicknames based on a combination of words and numbers.            
@@ -507,7 +624,7 @@ As an administrator, I want to be able to:
 4. Pagination: Integrate offset-based pagination with navigation links (next, prev, first, last).        
 5. Clean API Responses: Return user-friendly and discoverable API responses.           
 
-1. # Routes (user_routes.py)      
+# 1. Routes (user_routes.py)      
 ## Title:               
 Define the Search and Filtering Endpoint.           
 
@@ -528,127 +645,105 @@ These endpoints leverage schemas for input validation, dynamic filtering logic, 
 - Returns paginated results with metadata and the original filters for clarity.                
 
 ## Resolution Steps:        
-- Added the /users endpoint with the necessary query parameters.            
-- Integrated the UserService.search_and_filter_users method for filtering.         
-- Included generate_pagination_links to support paginated responses.         
-
-Purpose: Define the API endpoint for search and filtering functionality.        
-
-```python 
-@router.get("/users", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
-async def search_users(
-    request: Request,
-    username: Optional[str] = None,
-    email: Optional[str] = None,
-    role: Optional[str] = None,
-    account_status: Optional[bool] = None,
-    registration_date_start: Optional[datetime] = None,
-    registration_date_end: Optional[datetime] = None,
-    skip: int = 0,
-    limit: int = 10,
-    db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"]))
-):
-    """
-    Endpoint to search and filter users based on various criteria.
-    """
-    filters = {
-        "username": username,
-        "email": email,
-        "role": role,
-        "account_status": account_status,
-        "registration_date_start": registration_date_start,
-        "registration_date_end": registration_date_end,
-    }
-    users, total_users = await UserService.search_and_filter_users(db, filters, skip, limit)
-    user_responses = [UserResponse.model_validate(user) for user in users]
-    pagination_links = generate_pagination_links(request, skip, limit, total_users)
-
-    return UserListResponse(
-        items=user_responses,
-        total=total_users,
-        page=skip // limit + 1,
-        size=len(user_responses),
-        links=pagination_links
-    )
-```
-## Tests:      
-Covered by API tests in tests/test_api/test_users_api.py.
-
-
-
-2. # Service Layer (user_service.py)
-## Title:       
-Implement Filtering Logic.         
-
-## Description         
-This section defines the logic for filtering users based on criteria provided via the API. It interacts with the database and applies filters dynamically.           
-
-## Expected Outcome          
-The UserService.search_and_filter_users method should:
-
-1. Apply all filters, including username, email, role, account status, and date range.             
-2. Return paginated results along with the total count of users.            
-
-## Resolution Steps          
-- Implemented dynamic filtering using SQLAlchemy's query-building capabilities.               
-- Added support for pagination using offset and limit.           
-- Handled edge cases, such as missing or invalid filter values.           
-
-Purpose: Add the logic to perform filtering and querying of users from the database.          
+## Step 1:Basic Search Endpoint       
+- Added a GET endpoint for basic search.      
+- Integrated UserService.search_and_filter_users for filtering logic.     
+- Used UserSearchQueryRequest schema for query validation.       
+- Included pagination with generate_pagination_links utility.        
 
 ```python
-@staticmethod
-async def search_and_filter_users(
-    session: AsyncSession, 
-    filters: Dict[str, Optional[str]], 
-    skip: int, 
-    limit: int
-) -> Tuple[List[User], int]:
-    """
-    Search and filter users based on the given criteria.
-    """
-    query = select(User)
+@router.get("/users-basic", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
+async def basic_search_users(
+    request: Request,
+    query: UserSearchQueryRequest = Depends(),
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"])),
+):
+    total_users, users = await UserService.search_and_filter_users(
+        db,
+        filters=query.dict(exclude_none=True),
+        skip=query.skip,
+        limit=query.limit,
+    )
+    pagination_links = generate_pagination_links(request, query.skip, query.limit, total_users)
+    return UserListResponse(
+        items=[UserResponse.model_validate(user) for user in users],
+        total=total_users,
+        page=(query.skip // query.limit) + 1,
+        size=len(users),
+        links=pagination_links,
+        filters=query,
+    )
+```
+## Step 2: Advanced Search Endpoint     
+- Added a POST endpoint for advanced search.     
+- Integrated UserService.advanced_search_users for flexible dynamic filtering.         
+- Used UserSearchFilterRequest schema for JSON request validation.        
 
-    # Apply filters
-    if filters.get("username"):
-        query = query.filter(User.nickname.ilike(f"%{filters['username']}%"))
-    if filters.get("email"):
-        query = query.filter(User.email.ilike(f"%{filters['email']}%"))
-    if filters.get("role"):
-        query = query.filter(User.role == filters["role"])
-    if filters.get("account_status") is not None:
-        query = query.filter(User.email_verified == filters["account_status"])
-    if filters.get("registration_date_start") and filters.get("registration_date_end"):
-        query = query.filter(
-            User.created_at.between(filters["registration_date_start"], filters["registration_date_end"])
-        )
-
-    # Add pagination
-    query = query.offset(skip).limit(limit)
-
-    # Execute the query and count total users
-    result = await session.execute(query)
-    users = result.scalars().all()
-
-    total_query = select(func.count()).select_from(User)
-    total_result = await session.execute(total_query)
-    total_users = total_result.scalar()
-
-    return users, total_users
+```python
+@router.post("/users-advanced", response_model=UserListResponse, tags=["User Management Requires (Admin or Manager Roles)"])
+async def advanced_search_users(
+    request: Request,
+    filters: UserSearchFilterRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: dict = Depends(require_role(["ADMIN", "MANAGER"])),
+):
+    total_users, users = await UserService.advanced_search_users(
+        db,
+        filters=filters.dict(exclude_none=True),
+    )
+    pagination_links = generate_pagination_links(request, filters.skip, filters.limit, total_users)
+    return UserListResponse(
+        items=[UserResponse.model_validate(user) for user in users],
+        total=total_users,
+        page=(filters.skip // filters.limit) + 1,
+        size=len(users),
+        links=pagination_links,
+        filters=filters,
+    )
 ```
 
-## Tests           
-Covered by service layer tests in tests/test_service/test_user_service.py.        
+# 2. Service Layer
+## Title: Implement Dynamic Filtering and Pagination Logic      
+## Description:     
+The UserService handles all filtering and pagination logic. Both basic and advanced searches are dynamically implemented using SQLAlchemy. Filters are applied conditionally based on input values.      
 
+## Expected Outcome          
+1. Filters like username, email, role, is_locked, and registration date range are applied dynamically.      
+2. Supports pagination using skip and limit parameters for efficient querying.      
+3. Handles edge cases where filters are missing or invalid.                   
 
+## Resolution Steps          
+## Step1: Basic Filtering Logic    
+- Used dynamic query-building for basic search criteria.      
+```python
+if filters.get("username"):
+    query = query.where(User.nickname.ilike(f"%{filters['username']}%"))
+if filters.get("email"):
+    query = query.where(User.email.ilike(f"%{filters['email']}%"))
+if filters.get("created_from"):
+    query = query.where(User.created_at >= filters["created_from"])
+if filters.get("created_to"):
+    query = query.where(User.created_at <= filters["created_to"])
+```
+## Step2:Advanced Filtering Log      
+- Added flexibility to apply filters dynamically from JSON inputs.    
+```python
+for field, value in filters.items():
+    if field == "username" and value:
+        query = query.where(User.nickname.ilike(f"%{value}%"))
+    elif field == "created_from" and value:
+        query = query.where(User.created_at >= value)
+```
 
 3. # Schemas (user_schemas.py)          
-## Title:         
-Define Request Validation Model.             
+## Title:Define Validation Schemas for User Search and Filtering        
 
 ## Description           
-This section introduces the UserSearchParams schema to validate the query parameters sent to the /users endpoint.              
+Introduced two schemas to validate inputs for basic and advanced search:      
+1. UserSearchQueryRequest: For query parameters (GET).        
+2. UserSearchFilterRequest: For JSON body filters (POST).           
+These schemas ensure that inputs are correctly structured, validated, and documented.           
 
 ## Expected Outcome          
 The schema should:           
@@ -662,24 +757,31 @@ The schema should:
 Purpose: Define the models for query parameters and response structure.         
 
 ```python
-class UserSearchParams(BaseModel):
-    username: Optional[str] = Field(None, example="john_doe")
-    email: Optional[EmailStr] = Field(None, example="john.doe@example.com")
-    role: Optional[UserRole] = Field(None, example="ADMIN")
-    account_status: Optional[bool] = Field(None, example=True)
-    registration_date_start: Optional[datetime] = Field(None, example="2023-01-01T00:00:00Z")
-    registration_date_end: Optional[datetime] = Field(None, example="2023-12-31T23:59:59Z")
+class UserSearchQueryRequest(BaseModel):
+    username: Optional[str]
+    email: Optional[str]
+    role: Optional[UserRole]
+    is_locked: Optional[bool]
+    skip: int = Field(0, ge=0)
+    limit: int = Field(10, gt=0, le=100)
+
+class UserSearchFilterRequest(BaseModel):
+    username: Optional[str]
+    email: Optional[str]
+    role: Optional[UserRole]
+    created_from: Optional[datetime]
+    created_to: Optional[datetime]
+    skip: int = Field(0, ge=0)
+    limit: int = Field(10, gt=0, le=100)
+
 ```
 
-## Tests              
-Implicitly tested via API endpoint tests in tests/test_api/test_users_api.py.          
-
-# Pagination Helper (utils/pagination.py)        
+# 4. Pagination Helper (utils/pagination.py)        
 ## Title
 Generate Pagination Links.           
 
 ## Description           
-This section adds a helper function, generate_pagination_links, to create navigation links for paginated results.              
+A helper utility generates pagination links (next, prev, first, last) dynamically based on the current page, total users, and pagination parameters.                     
 
 ## Expected Outcome         
 The helper function should:
@@ -783,338 +885,243 @@ async def test_generate_pagination_links():
     assert links["last"] == "http://localhost:8000/users?skip=40&limit=10"
 ```
 
-## Tests
-Executed the test using pytest.             
-
-6. # Test API Endpoint           
-## Title
-Validate Search and Filtering Endpoint.              
-
-## Description              
-This section tests the /users endpoint to ensure it correctly handles search and filtering requests.              
-
-## Expected Outcome             
-The test should:
-1. Verify that query parameters are correctly processed.            
-2. Ensure the endpoint returns the expected results and pagination links.          
-
-## Resolution Steps              
-- Created a test for the /users endpoint with different query parameters.            
-- Validated the structure and correctness of the response.              
-
-Purpose: Test the /users endpoint with various search and filter criteria.           
-
-```python
-@pytest.mark.asyncio
-async def test_search_users_api(async_client, admin_token):
-    headers = {"Authorization": f"Bearer {admin_token}"}
-    query_params = {
-        "username": "john",
-        "role": "ADMIN",
-        "account_status": True,
-    }
-
-    response = await async_client.get(
-        f"/users?{urlencode(query_params)}", headers=headers
-    )
-    assert response.status_code == 200
-    data = response.json()
-    assert "items" in data
-    assert isinstance(data["items"], list)
-```
-
-7. # Test Service Layer           
-## Title            
-Validate Filtering Logic.          
-
-## Description              
-This section tests the filtering logic implemented in UserService.           search_and_filter_users.
-
-## Expected Outcome               
-The test should:             
-1. Ensure that filters are correctly applied.               
-2. Validate that pagination returns the expected number of results.           
-
-## Resolution Steps              
-- Created a test for UserService.search_and_filter_users with various filter combinations.            
-- Used a fixture to set up mock data.              
-
-Purpose: Test the filtering logic in the service layer.         
-
-```python
-@pytest.mark.asyncio
-async def test_search_and_filter_users(users_with_same_role_50_users, db_session):
-    filters = {"role": "ADMIN"}
-    users, total = await UserService.search_and_filter_users(
-        db_session, filters, skip=0, limit=10
-    )
-    assert len(users) == 10
-    assert total == 50
-```
-8. # Test Fixture (tests/conftest.py)             
-## Title
-Set Up Mock Data.           
-
-## Description             
-This section creates mock user data for testing purposes.           
-
-## Expected Outcome         
-The fixture should:              
-1. Create a predefined set of mock users.             
-2. Ensure that the test environment has consistent data.              
-
-## Resolution Steps             
-- Defined a fixture to create 50 mock users with the same role.           
-- Committed the data to the database session.          
-
-Purpose: Set up data for testing.          
-
-```python
-@pytest.fixture(scope="function")
-async def users_with_same_role_50_users(db_session: AsyncSession):
-    users = []
-    for i in range(50):
-        user_data = {
-            "nickname": f"user_{i}",
-            "email": f"user{i}@example.com",
-            "role": "ADMIN",
-        }
-        user = User(**user_data)
-        db_session.add(user)
-        users.append(user)
-    await db_session.commit()
-    return users
-```
-## Tests
-Used by service layer tests in tests/test_service/test_user_service.py.       
-
-## Conclusion
-The above updates comprehensively implement the feature, meeting all requirements. The code now supports search and filtering by multiple criteria, provides paginated responses, and includes extensive tests to ensure reliability.            
-
-
-
 # Tests for User Search and Filtering Feature      
 ## Overview         
-The user search and filtering functionality is tested extensively to ensure it meets the defined requirements and behaves as expected under various conditions. These tests validate the API endpoint, service layer, pagination, and filtering mechanisms. Below is a detailed explanation of each test and its purpose.              
+The user search and filtering functionality is tested extensively to ensure it meets the defined requirements and behaves as expected under various conditions. These tests validate the API endpoint, service layer, pagination, and filtering mechanisms. Below is a detailed explanation of each test and its purpose.           
+# test_api/test_user_search_and_filtering.py         
+# 1. test_search_users_api:        
+- Purpose: To verify the /users endpoint correctly handles search requests with valid parameters.            
+- Description: This test sends a GET request with specific filters like username, role, and account status to ensure the endpoint returns filtered users.       
+- Expected Outcome:
+  - Status code 200.        
+  - Response includes an items list containing users with the correct fields like nickname and email.         
+- Importance: Ensures the basic search functionality works and returns the expected user data for valid inputs.
 
-1. ## test_empty_filters_api     
+# 2. test_empty_filters_api:     
+- Purpose: To check that the /users endpoint works without any filters applied.        
+- Description: Sends a request with no query parameters and expects all users to be returned.       
+- Expected Outcome:      
+  - Status code 200.        
+  - Response includes all users in the system as a list under items.
+total count matches the number of users in the database.        
+- Importance: Validates that the endpoint correctly handles empty filters and provides all results.          
 
-- Purpose:      
-Tests the behavior of the API when no filters are provided.            
-- Description:         
-Simulates an API call with no query parameters. This validates the default behavior of returning all users with pagination applied.             
+# 3. test_fetch_all_users:      
+- Purpose: To test pagination with no filters by fetching the first set of users.          
+- Description: Sends a GET request with pagination parameters (skip and limit) and validates the response structure.        
+- Expected Outcome:       
+  - Status code 200.        
+  - Correct number of users returned based on limit.          
+  - total users count is non-negative.       
+- Importance: Ensures pagination works correctly and provides partial results as requested.       
+
+# 4. test_search_users_pagination:      
+- Purpose: To validate pagination behavior when fetching user results across multiple pages.       
+- Description: Tests fetching users with different offsets (skip) and ensures results are paginated properly.          
+- Expected Outcome:          
+  - Status code 200.       
+  - Response items match the requested limit.        
+  - Second page contains the next set of results.         
+- Importance: Ensures consistent and accurate pagination, a crucial feature for handling large datasets.            
+
+# 5. test_advanced_search_users_with_all_filters:        
+- Purpose: To verify the advanced search endpoint works when all filters are applied.          
+- Description: Sends a POST request with filters like username, email, role, account status, and date range.         
+- Expected Outcome:          
+  - Status code 200.            
+  - Returned users match all specified filters.         
+  - The result is paginated.           
+- Importance: Tests the robustness of the advanced search feature and its ability to handle multiple criteria simultaneously.         
+
+# 6. test_advanced_search_users_with_date_range_no_results        
+- Purpose: To verify the behavior when a date range filter returns no results.          
+- Description: Sends a POST request with a date range that doesn’t match any users.         
 - Expected Outcome:         
-The API should return the default list of users paginated according to the specified limit and skip values.           
-- Importance:          
-Ensures that the endpoint works even without filters and that pagination is correctly applied by default.          
+  - Status code 200.       
+  - total count is 0.        
+  - items list is empty.              
+- Importance: Ensures the endpoint handles edge cases gracefully without errors.         
 
-2. # test_search_users_api          
+# 7. test_advanced_search_users_with_invalid_role     
+- Purpose: To validate that invalid role inputs are handled properly.      
+- Description: Sends a POST request with an invalid role value that does not match the system-defined roles.           
+- Expected Outcome:         
+  - Status code 422 (validation error).        
+  - detail field in the response contains an appropriate validation error message.        
+- Importance: Ensures data validation is strict, preventing incorrect inputs from breaking the system.       
 
-- Purpose:         
-Validates the core functionality of searching for users based on specific criteria like username, role, and account status.         
-- Description:           
-Sends a request with valid search filters and verifies that the API correctly filters the users.           
+# 8. test_advanced_search_users_with_partial_email       
+- Purpose: To test partial email matching in the advanced search endpoint.        
+- Description: Sends a request with a partial email string and verifies that matching users are returned.        
+- Expected Outcome:        
+  - Status code 200.       
+  - Returned users' emails contain the partial string.        
+- Importance: Verifies the flexibility of the search feature and ensures partial matches work correctly.          
+
+# 9. test_advanced_search_users_pagination_exceeding_total       
+- Purpose: To check pagination behavior when skip exceeds the total number of results.         
+- Description: Sends a request with a high skip value to simulate an out-of-bounds scenario.           
+- Expected Outcome:         
+  - Status code 200.       
+  - items list is empty.        
+  - total count remains valid and non-negative.        
+- Importance: Ensures that pagination handles edge cases properly without causing errors or crashes.              
+
+# test_user_search_and_filtering_service.py      
+## Description
+This test suite ensures the robustness of user search and filtering functionalities in the UserService. It includes various scenarios such as filtering by username, email, role, and account status, as well as advanced features like case-insensitive searches, date range filters, and pagination. The suite validates that the search logic dynamically handles multiple filters, adheres to expected constraints, and returns accurate results, even in edge cases.         
+
+# 1. test_search_users_by_username        
+- Purpose: To verify filtering users by partial username works as expected.            
+- Description: Tests the search_and_filter_users method by providing the first three characters of a user's username in a case-insensitive manner.
+- Expected Outcome:               
+  - At least one user is returned (total > 0).        
+  - All returned users have nicknames containing the partial input.       
+- Importance: Ensures that users can be searched flexibly by partial usernames, supporting case-insensitive searches.        
+
+# 2. test_filter_users_by_role       
+- Purpose: To validate filtering users by their role.        
+- Description: Tests if users with a specific role (ADMIN) are returned correctly.          
+- Expected Outcome:             
+  - Total users returned are non-negative.        
+  - All users in the result have the role ADMIN.         
+- Importance: Confirms that role-based filtering works as expected, which is critical for role-based access management.         
+
+# 3. test_filter_users_by_account_status         
+- Purpose: To validate filtering users by their account status.          
+- Description: Tests the is_locked filter to return only unlocked users (is_locked=False).            
+- Expected Outcome:          
+  - Total users returned are non-negative.          
+  - All returned users have their is_locked status set to False.         
+- Importance: Ensures that administrators can manage locked or unlocked accounts effectively.        
+
+# 4. test_filter_users_by_email        
+- Purpose: To validate filtering users by their email.          
+- Description: Tests the system’s ability to match users based on their email address.            
+- Expected Outcome:            
+  - Users with the exact email match are returned.            
+  - Importance: Ensures accurate search functionality when filtering by email, which is a key identifier for users.         
+
+  # 5. test_combination_of_filters
+- Purpose: To test the combination of multiple filters.          
+- Description: Applies multiple filters like username, role, and account status simultaneously to validate combined filtering.           
 - Expected Outcome:           
-Only users matching the specified filters should be returned.             
-- Importance:            
-Verifies that the API handles search parameters correctly and filters the user list as expected.             
+  - Users matching all specified filters are returned.           
+- Importance: Validates that the system can handle complex queries with multiple conditions.           
 
-3. # test_combination_of_filters:
+# 6. test_filter_users_case_insensitive
+- Purpose: To ensure filtering works in a case-insensitive manner for usernames and emails.          
+- Description: Tests partial and case-insensitive matches for username and email filters.           
+- Expected Outcome:         
+  - Users are returned regardless of case differences in nickname and email.            
+- Importance: Ensures usability and flexibility by supporting case-insensitive searches.         
 
-- Purpose:
-Ensures that multiple filters applied together work correctly.         
-- Description:          
-Combines filters like username, role, and account status in a single request and verifies the response.          
-- Expected Outcome:  Only users matching all specified filters should be returned.       
-- Importance:        
-Validates the API's ability to handle complex queries with multiple filters applied simultaneously.        
-4. # test_filter_users_by_email        
+# 7. test_advanced_search_users_with_no_filters          
+- Purpose: To test advanced search when no filters are provided.         
+- Description: Validates that the system returns all users with default pagination.             
+- Expected Outcome:          
+  - Total users match the count of all users in the system.         
+  - Results respect the default pagination limit.          
+- Importance: Ensures the system handles empty filter input gracefully and defaults to returning all users.         
 
-- Purpose:          
-Tests filtering users based on their email addresses.         
-- Description:     
-Sends a request with an email filter to ensure the API correctly returns users matching the email criteria.        
-- Expected Outcome:        
-Users with the specified email should be returned, and no additional users should be included.           
-- Importance:       
-Verifies that the API accurately handles email-based filters.         
+# 8. test_advanced_search_users_with_username_filter         
+- Purpose: To verify advanced search works with a partial username filter.
+- Description: Filters users using a partial match on the username.       
+- Expected Outcome:         
+  - Users returned match the partial username filter.           
+- Importance: Confirms flexibility in username-based searches within the advanced search         
 
-5. # test_filter_users_by_registration_date   
+# 9. test_advanced_search_users_with_email_filter        
+- Purpose: To validate advanced search functionality with partial email filters.         
+- Description: Filters users based on a partial email match.          
+- Expected Outcome:            
+  - Users returned have emails containing the specified partial string.        
+- Importance: Ensures that partial matches for email work effectively.    
 
-- Purpose:       
-Validates filtering users based on their registration date range.      
-- Description:         
-Uses registration_date_start and registration_date_end to filter users registered within a specific date range.      
-- Expected Outcome:        
-Only users who registered within the specified range should be included in the response.         
-- Importance:          
-Ensures that the API supports date-based filtering and that the implementation is accurate.         
+# 10. test_advanced_search_users_with_role_filter         
+- Purpose: To test advanced search filtering users by role.         
+- Description: Filters users with the AUTHENTICATED role.         
+- Expected Outcome:         
+  - All returned users have the role AUTHENTICATED.         
+- Importance: Ensures the role filter is correctly applied in the advanced search.          
 
-6. # test_filter_users_by_account_status     
+# 11. test_advanced_search_users_with_date_range_filter          
+- Purpose: To validate filtering users based on a date range.         
+- Description: Filters users created within the last 30 days using created_from and created_to filters.           
+- Expected Outcome:          
+  - Users' created_at timestamps fall within the specified range.        
+- Importance: Critical for time-based filtering, such as identifying new user accounts or activity trends.         
 
-- Purpose:      
-Tests filtering users based on their account status (e.g., verified or unverified).      
+# 12. test_advanced_search_users_with_pagination         
+- Purpose: To test pagination functionality in the advanced search endpoint.         
+- Description: Uses skip and limit filters to fetch paginated results.          
+- Expected Outcome:       
+  - Results respect the pagination parameters (skip=10, limit=10).       
+  - Total count matches the total users in the database.           
+- Importance: Ensures efficient navigation and result management for large datasets.        
+
+# test_user_search_and_filtering_pagination.py       
+## Description          
+This test suite focuses on validating the pagination functionality for user search results. It ensures that the pagination logic, including the generation of dynamic navigation links (e.g., self, next, prev, first, last), works correctly in various scenarios. The tests cover both general pagination behavior and edge cases, such as when the total number of items is less than the limit or when the offset (skip) exceeds the total number of items.         
+
+# 1. test_generate_pagination_links         
+- Purpose: To validate that the generate_pagination_links function creates accurate pagination links.         
 - Description:        
-Filters users based on their account verification status and validates the API response.       
-- Expected Outcome:       
-The response should only include users with the specified account status.        
-- Importance:       
-Verifies that account status filtering is functioning correctly.       
+  - Simulates a request to the /users endpoint with skip=0, limit=10, and a total of 45 users.         
+  - Verifies the correctness of links (self, first, last, and next) generated for the pagination state.         
+  - Ensures that the prev link does not appear on the first page.         
+- Expected Outcome:         
+  - Correct links for self, first, last, and next are generated.         
+  - The prev link is not generated for the first page.           
+- Importance:Ensures smooth navigation through paginated results, improving usability and API consistency.              
 
-7. # test_filter_users_by_role       
- 
- - Purpose:         
- Ensures users can be filtered based on their role (e.g., ADMIN, USER, MANAGER).      
- - Description:      
- Sends a request with a role filter and validates the response.       
- - Expected Outcome:      
- The API should return only users with the specified role.       
- - Importance:       
- Confirms that role-based filtering works as expected.         
+# 2. test_pagination_edge_cases        
+- Purpose: To test edge cases for pagination logic, such as small datasets and exact page boundaries.        
+- Description:
+  - Case 1: Total users are less than the pagination limit (limit=10, total_items=5).       
+    - Verifies that no next or prev links are generated.         
+  - Case 2: Total users are exactly a multiple of the limit (limit=10, total_items=20).         
+    - Checks correctness of the last and next links.      
+- Expected Outcome:
+  - For small datasets: Only self and first links are generated.         
+- For exact page boundaries: next and last links are generated correctly.          
+- Importance:Confirms that the pagination logic handles edge cases gracefully, preventing unnecessary or invalid navigation links.        
 
- 8. # test_search_users_by_username        
+# 3. test_pagination_boundary          
+- Purpose: To test boundary cases for the /users API endpoint with pagination parameters.         
+- Description:
+  - Case 1: Skip value (skip=10000) exceeds the total number of users.            
+    - Ensures no results are returned and the response is handled correctly.           
+  - Case 2: Skip value is 0 and limit is set to 1.           
+    - Verifies that only one user is returned and the total count remains accurate.            
+- Expected Outcome:
+  - For skip > total_items: API returns no results with total >= 0.       
+  - For skip=0 and limit=1: API returns one result or fewer.        
+- Importance:Ensures the API correctly handles pagination boundaries, preventing invalid queries or inconsistent responses.         
 
- - Purpose:      
- Validates searching for users by their username.        
- - Description:        
- Tests the username search filter to ensure partial matches (using ilike) return the correct users.        
- - Expected Outcome:      
- Users whose usernames match the search string (partially or fully) should be returned.       
- - Importance:       
- Ensures that username-based search functionality is accurate.       
+## Search and Filtering API Tests        
+This image shows the test output for verifying search and filter functionality at the API level:       
+![Alt text for image](images/Test_and_serach_for_api.jpg)      
 
- 9. # test_generate_pagination_links       
+## Search and Filtering Service Layer Tests        
+This image highlights the test results for search and filtering functionality in the service layer:        
+![Alt text for image](images/Test_and_search_service.jpg)       
 
- - Purpose:        
- Tests the generate_pagination_links helper function.      
- - Description:       
- Verifies that the pagination links for next, prev, first, and last pages are generated correctly based on the total number of users and the current offset.        
- - Expected Outcome:      
- Correct pagination links should be returned for various scenarios.       
- - Importance:        
- Validates the correctness of pagination link generation, ensuring smooth navigation across pages.         
+## Pagination Tests           
+This image demonstrates the output for the tests verifying pagination edge cases:         
+![Alt text for image](images/Test_search_pagination.jpg)       
 
- 10. # test_pagination_boundary       
+# Test Coverage :       
+This image shows the final test coverage of the entire project. It demonstrates the percentage of code covered by the implemented unit and integration tests.        
+![Test Coverage Report](images/FINAL_TEST_COVERAGE.jpg)      
 
- - Purpose:       
- Ensures the API handles edge cases for pagination correctly.       
- - Description:       
- Tests scenarios like requesting a page beyond the total number of users or when the number of users is less than the page size.        
- - Expected Outcome:        
- The API should handle these scenarios gracefully without errors and return appropriate results (e.g., an empty list for out-of-bound pages).         
- - Importance:        
- Validates that pagination edge cases are handled correctly, ensuring a robust implementation.         
+# Pytest Results:             
+This image displays the final Pytest output for the whole project. It confirms the successful execution of all tests, ensuring the functionality and reliability of the system.         
+![Final Pytest Results](images/FINAL_FINAL_PYTEST.jpg)      
 
-11. # test_filter_users_case_insensitive      
 
-- purpose:         
-Verify Case-Insensitive Filtering of Users       
-- Description       
-The purpose of this test is to ensure that the user search and filtering functionality works correctly regardless of the case of the input provided. User data in the database might have mixed-case values, but administrators or users should be able to search for them without worrying about capitalization. This test verifies that the filtering mechanism is case-insensitive for key fields such as usernames, emails, and roles.       
-- Expected Outcome:       
-The system should match and return user data even when the case of the search query does not exactly match the case stored in the database.          
-- Test Scenario:       
-1. A database is preloaded with mock user data that includes usernames, emails, and roles in mixed cases.         
-2. The test performs searches using different cases (e.g., all lowercase, all uppercase, mixed case) for:       
-- Usernames      
-- Emails       
-- Roles         
-The test validates that the correct user records are returned regardless of the case of the search query.       
-- Test Steps:        
-- Define filters with varying cases for username, email, and role.          
-- Call the search_and_filter_users service with these filters.          
-- Assert that the returned results match the expected users, confirming case-insensitive behavior.            
 
-- Results:         
-- If the test passes, it confirms that the filtering logic is case-insensitive.       
-- If the test fails, it indicates that the service or database query needs to be updated to handle case-insensitive comparisons correctly.              
-
-- Why It’s Important:           
- This test ensures that the application is user-friendly and robust. Users might not always input the exact case when searching for data, and failing to account for this could result in missed results or user frustration. Implementing and validating case-insensitivity improves usability and avoids such pitfalls.        
-
- 12. # test_fetch_all_users       
- - purpose:       
- Verify Fetching All Users Without Filters.    
- - Expected Outcome:       
-- The API should return a list of users with proper pagination when no filters are applied.        
-- The response should include the total count of users and an array of user items.      
-- Test Scenario:          
-1. The test sends a GET request to the /users endpoint without any filters, specifying only basic pagination parameters (skip and limit).        
-2. It verifies that the response:        
-- Has a status code of 200 OK.        
-- Contains a key called items representing the list of users.          
-- Contains a key called total representing the total number of users in the system.      
-- Ensures that items is a list.        
-- Test Steps:         
-1. Set up the required authorization headers using an admin token.          
-2. Specify basic pagination parameters (skip and limit).           
-3. Send a GET request to the /users endpoint with these parameters.         
-3. Validate the response by asserting:
-The status code is 200.          
-4. The response includes the items key, and it contains a list.            
-5. The total key exists and is a non-negative integer.         
-- Results:          
-If the test passes:         
-- It confirms that the /users endpoint     correctly handles requests without filters.      
-- It ensures that the response includes essential data such as the list of users and the total user count.         
-If the test fails:      
-- It indicates an issue with the endpoint's ability to fetch unfiltered user data or manage pagination.                 
-- Why It’s Important:            
- This test validates the core functionality of the /users endpoint. Being able to fetch all users without filters is a fundamental feature that administrators rely on for user management. Ensuring the API can handle this scenario correctly, including providing accurate pagination details, is critical for usability and reliability.         
-
- 13. # test_pagination_edge_cases      
- - purpose:        
- Verify Pagination Utility Handles Edge Cases        
- - Description:          
-  This test ensures that the pagination utility (generate_pagination_links) handles edge cases correctly. It validates the behavior of pagination links under specific conditions, ensuring the utility functions as expected in less common scenarios.      
-  - Expected Outcome:             
-1. The utility should correctly calculate pagination links when the total number of items is less than the specified limit.       
-2. The utility should generate correct links when the total number of items is an exact multiple of the limit.               
-- Test Scenario:           
-1. Case 1: Total items are fewer than the pagination limit.            
-- There should be no "next" or "previous" links because all items fit on the first page.           
-2. Case 2: Total items are an exact multiple of the pagination limit.              
-- The "last" link should correctly point to the last page, ensuring accurate boundary handling.          
-- Test Steps:          
- 1. Setup: Create a mock request object simulating the API's base URL and query parameters.                  
-2. Case 1:
-- Generate pagination links with a total number of items less than the limit.       
-- Verify that "next" and "prev" links are None.                
-3. Case 2:
-- Generate pagination links with the total number of items being a multiple of the limit.           
-- Verify that the "last" link points to the last page with the correct skip and limit parameters.       
-- Results:        
-If the test passes:        
-It confirms that the pagination utility correctly handles edge cases, ensuring accurate and reliable pagination links.      
-If the test fails:          
-It indicates issues in the pagination utility, particularly in handling edge scenarios like small datasets or perfectly divisible totals.        
-- Why It’s Important:           
-Pagination is essential for efficiently navigating large datasets. Edge cases like small datasets or exact multiples of the limit can expose hidden bugs in the pagination logic. This test ensures the utility can handle such scenarios gracefully, providing a consistent user experience.     
-
-14. # test_search_users_pagination       
-- purpose:      
- Verifies that the API correctly applies pagination when fetching users.       
- - Description:          
-1. This test validates the proper implementation of pagination functionality in the /users API endpoint. It ensures that:           
-- The endpoint correctly returns a subset of users based on the skip and limit parameters.        
-- The pagination system is working as expected by retrieving different pages of results.       
-- Steps Taken:       
-1. Headers Setup: The test sets up the Authorization headers with an admin token to access the endpoint.             
-2. First Page Test:          
-- It sends a request to fetch the first page of users with a skip of 0 and a limit of 5.        
-- The test validates that the response returns exactly 5 users and that these users are in the expected range.         
-- Second Page Test:         
-It sends another request to fetch the next page with a skip of 5 and the same limit of 5.           
-The test ensures that the results are different from the first page and validates the count.          
-- Expected Outcomes:           
-1. The /users endpoint returns users in chunks based on the skip and limit values.      
-- The total number of items in the first page matches the limit.         
-- The second page results do not overlap with the first page.            
-- The test ensures the total key in the response correctly reflects the total count of users in the database.           
-- What This Test Verifies:         
-1. The endpoint handles skip and limit parameters correctly.         
-2. Pagination works seamlessly and doesn't repeat or omit records between pages.         
-3. The API provides accurate metadata about the total number of users.            
+           
 
 
 
