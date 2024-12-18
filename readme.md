@@ -152,7 +152,7 @@ Users can run the following command to build and run the application successfull
 docker compose up --build
 ```
 ## output of Pytest:      
-![Before Implementing](images/before%20implementing.jpg)            
+![Before implementing](images/first%20pytest.jpg)        
 
 ## Files Updated:      
 1. Dockerfile         
