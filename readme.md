@@ -343,7 +343,7 @@ Key Tests:
 ![Test User Service Results](images/user_service_readme.jpg)
 
 
-# IISUE: Password Validation and Security Enhancements     
+# ISSUE: Password Validation and Security Enhancements     
 ## Enhancement:                  
 To ensure the highest level of security for user accounts, we have introduced robust password validation mechanisms. These updates are designed to align with industry standards for secure password practices, minimizing the risk of unauthorized access and protecting user data.          
 
@@ -394,7 +394,7 @@ Enhanced to include new test cases that validate the updated password rules. The
 ## Pytest    
 ![Password Validation Output](images/output%20for%20password%20validation.jpg)
 
-# IISUE:User Uniqueness Validation         
+# ISSUE:User Uniqueness Validation         
 ## Enhancement:         
 In modern systems, user uniqueness is a cornerstone of both security and usability. This enhancement ensures that users cannot share the same identifiers, such as nicknames or email addresses, providing a more secure, reliable, and seamless experience across the platform.           
 
@@ -481,7 +481,7 @@ For more details, review the specific files and tests updated as part of this en
 ![User Uniqueness Output](images/user_uniquness.jpg)
 
 
-# IISUE: Automatically Assign Admin Role to First Registered User        
+# ISSUE: Automatically Assign Admin Role to First Registered User        
 ## Enhancement:        
 This enhancement ensures that the first user to register in the application is automatically assigned the ADMIN role. This functionality streamlines the initialization process by eliminating the need for manual configuration or updates to grant admin privileges for the first user.           
 
@@ -518,7 +518,7 @@ This enhancement ensures that the first user to register in the application is a
 ![First Auto Admin Output](images/first-auto-admin.jpg)
 
 
-# IISUE: User Bio Update Validation and Error Handling          
+# ISSUE: User Bio Update Validation and Error Handling          
 
 ## Enhancement:           
 This enhancement focuses on improving the validation and error handling mechanisms for the update_user_bio functionality in the user management system. It ensures that API responses are clear, consistent, and informative, making the feature more user-friendly and robust. Validation checks are introduced to verify the presence of the bio field and enforce a maximum length constraint of 500 characters. Additionally, error messages are standardized to provide actionable feedback to API consumers. Comprehensive tests are added to validate the functionality and edge cases, ensuring a reliable and seamless experience for both developers and users.          
@@ -567,7 +567,7 @@ This enhancement focuses on improving the validation and error handling mechanis
 ## Pytest:        
 ![Description of Image](images/issue_update_field1.jpg)
 
-# IISUE: Ensure Admin User Exists and Streamline /login Authentication Logic     
+# ISSUE: Ensure Admin User Exists and Streamline /login Authentication Logic     
 
 ## Enhancement:       
 The /login logic in user_routes.py was repeated multiple times, making the code redundant and harder to maintain. Additionally, authenticating as an admin user through Swagger (using the Authorize button) was not functioning as expected. This issue ensures the admin user (admin@example.com) is dynamically seeded into the database during migrations or tests, reducing code duplication and enabling secure and consistent authentication.           
@@ -736,7 +736,7 @@ for field, value in filters.items():
         query = query.where(User.created_at >= value)
 ```
 
-3. # Schemas (user_schemas.py)          
+# 3. Schemas (user_schemas.py)          
 ## Title:Define Validation Schemas for User Search and Filtering        
 
 ## Description           
@@ -840,7 +840,7 @@ def generate_pagination_links(
     }
 ```
 
-5. # Test for Pagination Helper            
+# 5. Test for Pagination Helper            
 ## Title           
 Validate Pagination Links.           
 
